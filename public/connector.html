@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Numeriq Connector</title>
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+</head>
+
+<body>
+
+<script>
+window.TrelloPowerUp.initialize({
+
+  "board-buttons": function (t) {
+
+    return t.get('board', 'shared', 'showBadges', true).then(function(showBadges) {
+
+      return [
+        {
+          icon: {
+            light: "https://cdn-icons-png.flaticon.com/512/709/709612.png",
+            dark: "https://cdn-icons-png.flaticon.com/512/709/709612.png"
+          },
+
+          text: showBadges ? "Hide #" : "Show #",
+
+          callback: function (t) {
+            return t.set('board', 'shared', 'showBadges', !showBadges);
+          }
+        }
+      ];
+
+    });
+
+  },
+
+
+  "card-badges": function (t) {
+
+    return Promise.all([
+      t.card('idShort'),
+      t.get('board', 'shared', 'showBadges', true)
+    ]).then(function(values) {
+
+      var card = values[0];
+      var showBadges = values[1];
+
+      if (!showBadges) {
+        return [];
+      }
+
+      return [
+        {
+          text: '#' + card.idShort,
+          color: 'blue'
+        }
+      ];
+
+    });
+
+  }
+
+});
+</script>
+
+</body>
+</html>
