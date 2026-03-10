@@ -7,34 +7,34 @@
 </head>
 
 <body>
-
 <script>
 window.TrelloPowerUp.initialize({
 
+  // Eye toggle button
   "board-buttons": function (t) {
-
     return t.get('board', 'shared', 'showBadges', true).then(function(showBadges) {
 
-      return [
-        {
-          icon: {
-            light: "https://cdn-icons-png.flaticon.com/512/709/709612.png",
-            dark: "https://cdn-icons-png.flaticon.com/512/709/709612.png"
-          },
+      return [{
+        icon: {
+          light: showBadges
+            ? "https://cdn-icons-png.flaticon.com/512/709/709612.png"
+            : "https://cdn-icons-png.flaticon.com/512/565/565654.png",
+          dark: showBadges
+            ? "https://cdn-icons-png.flaticon.com/512/709/709612.png"
+            : "https://cdn-icons-png.flaticon.com/512/565/565654.png"
+        },
 
-          text: showBadges ? "Hide #" : "Show #",
+        text: showBadges ? "Hide #" : "Show #",
 
-          callback: function (t) {
-            return t.set('board', 'shared', 'showBadges', !showBadges);
-          }
+        callback: function (t) {
+          return t.set('board', 'shared', 'showBadges', !showBadges);
         }
-      ];
+      }];
 
     });
-
   },
 
-
+  // Card number badge
   "card-badges": function (t) {
 
     return Promise.all([
@@ -45,23 +45,17 @@ window.TrelloPowerUp.initialize({
       var card = values[0];
       var showBadges = values[1];
 
-      if (!showBadges) {
-        return [];
-      }
+      if (!showBadges) return [];
 
-      return [
-        {
-          text: '#' + card.idShort,
-          color: 'blue'
-        }
-      ];
+      return [{
+        text: '#' + card.idShort,
+        color: 'blue'
+      }];
 
     });
-
   }
 
 });
 </script>
-
 </body>
 </html>
