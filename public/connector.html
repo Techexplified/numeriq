@@ -19,7 +19,7 @@ window.TrelloPowerUp.initialize({
       callback: function (t) {
         return t.popup({
           title: "Numeriq Stats",
-          url: "./index.html", // This correctly points to your React app!
+          url: "./index.html", 
           height: 350
         });
       }
@@ -33,7 +33,7 @@ window.TrelloPowerUp.initialize({
       callback: function (t) {
         return t.popup({
           title: "Select Story Points",
-          url: "./points.html", // Points to your custom UI
+          url: "./points.html",
           height: 240
         });
       }
@@ -41,27 +41,47 @@ window.TrelloPowerUp.initialize({
   },
 
   "card-badges": function (t) {
+    // We need to fetch: 
+    // 1. storyPoints (our custom data)
+    // 2. idShort (the #number)
+    // 3. labels (for Urgent/Low Priority)
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
-      t.card("labels")
+      t.card("idShort", "labels")
     ]).then(function([points, card]) {
       const badges = [];
 
-      if (points) {
-        badges.push({ text: "🔢 " + points + " Pts", color: "blue" });
+      // 1. ADD THE #NUMBER (Blue Badge)
+      if (card.idShort) {
+        badges.push({
+          text: "#" + card.idShort,
+          color: "blue"
+        });
       }
 
+      // 2. ADD THE STORY POINTS (Score)
+      if (points) {
+        badges.push({ 
+          text: "🔢 " + points + " Pts", 
+          color: "purple" // Purple makes it stand out from the ID
+        });
+      }
+
+      // 3. ADD THE LABELS (Urgent/Low Priority)
       if (card.labels && card.labels.length > 0) {
         card.labels.forEach(label => {
           const labelName = label.name.toLowerCase();
-          if (labelName.includes("urgent")) badges.push({ text: "🚨 URGENT", color: "red" });
-          else if (labelName.includes("low priority")) badges.push({ text: "🔽 LOW PRIORITY", color: "sky" });
+          if (labelName.includes("urgent")) {
+            badges.push({ text: "🚨 URGENT", color: "red" });
+          } else if (labelName.includes("low priority")) {
+            badges.push({ text: "🔽 LOW PRIORITY", color: "sky" });
+          }
         });
       }
+      
       return badges;
     });
   }
-
 });
 </script>
 </body>

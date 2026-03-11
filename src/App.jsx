@@ -14,27 +14,33 @@ function App() {
   useEffect(() => {
     const t = window.TrelloPowerUp.iframe();
 
-    async function loadData() {
+   async function loadData() {
       const board = await t.board("name");
       setBoardName(board.name);
 
+      // Fetch cards and their shared story points
       const data = await t.board("cards", "members");
-      setCards(data.cards);
+      
+      // We have to loop through cards to get their custom 'storyPoints'
+      const cardsWithPoints = await Promise.all(
+        data.cards.map(async (card) => {
+          const points = await t.get(card.id, 'shared', 'storyPoints');
+          return { ...card, storyPoints: points };
+        })
+      );
 
-      const counts = {};
-      data.cards.forEach(card => {
+      setCards(cardsWithPoints);
+
+      const memberCounts = {};
+      cardsWithPoints.forEach(card => {
         card.idMembers.forEach(member => {
-          counts[member] = (counts[member] || 0) + 1;
+          // If the card has points, we add the points. Otherwise, just count the task.
+          const val = card.storyPoints ? parseInt(card.storyPoints, 10) : 1;
+          memberCounts[member] = (memberCounts[member] || 0) + val;
         });
       });
-      setMembers(counts);
-
-      // NEW: Ask Trello if the user previously turned badges off. 
-      // It defaults to 'true' if they haven't clicked anything yet.
-      const savedPreference = await t.get('board', 'shared', 'showBadges', true);
-      setShowBadges(savedPreference);
+      setMembers(memberCounts);
     }
-
     loadData();
   }, []);
 
