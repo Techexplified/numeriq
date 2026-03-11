@@ -1,20 +1,65 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <title>Numeriq</title>
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+</head>
 
-    <!-- Trello Power-Up Client Library -->
-    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+<body>
 
-    <title>numeriq</title>
-  </head>
+<script>
+window.TrelloPowerUp.initialize({
 
-  <body>
-    <div id="root"></div>
+  "card-badges": function (t, options) {
+    return t.card("labels").then(function(card) {
+      const badges = [];
 
-    <!-- React App -->
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+      if (card.labels && card.labels.length > 0) {
+        card.labels.forEach(label => {
+          
+          // Convert to lowercase so "Urgent", "URGENT", and "urgent" all work
+          const labelName = label.name.toLowerCase();
+
+          // 1. Critical / Urgent
+          if (labelName.includes("urgent") || labelName.includes("critical")) {
+            badges.push({ text: "🚨 URGENT", color: "red" });
+          } 
+          
+          // 2. Blocked / Stuck
+          else if (labelName.includes("blocked") || labelName.includes("stuck")) {
+            badges.push({ text: "🛑 BLOCKED", color: "orange" });
+          } 
+          
+          // 3. In Progress / Doing
+          else if (labelName.includes("in progress") || labelName.includes("doing")) {
+            badges.push({ text: "⏳ IN PROGRESS", color: "yellow" });
+          } 
+          
+          // 4. Needs Review / QA
+          else if (labelName.includes("review") || labelName.includes("qa")) {
+            badges.push({ text: "👀 NEEDS REVIEW", color: "purple" });
+          } 
+          
+          // 5. Completed / Done
+          else if (labelName.includes("completed") || labelName.includes("done")) {
+            badges.push({ text: "✅ COMPLETED", color: "green" });
+          } 
+          
+          // 6. Low Priority / Backlog
+          else if (labelName.includes("low priority") || labelName.includes("backlog")) {
+            badges.push({ text: "🔽 LOW PRIORITY", color: "sky" });
+          }
+
+        });
+      }
+
+      return badges;
+    });
+  }
+
+});
+</script>
+
+</body>
 </html>
