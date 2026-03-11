@@ -5,9 +5,7 @@
   <title>Numeriq Connector</title>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
 </head>
-
 <body>
-
 <script>
 window.TrelloPowerUp.initialize({
 
@@ -21,25 +19,50 @@ window.TrelloPowerUp.initialize({
       callback: function (t) {
         return t.popup({
           title: "Numeriq Stats",
-          url: "./index.html",
-          height: 250
+          url: "./index.html", // This correctly points to your React app!
+          height: 350
         });
       }
     }];
   },
 
-  // still keeps your card numbers
+  "card-buttons": function (t) {
+    return [{
+      icon: "https://cdn-icons-png.flaticon.com/512/1828/1828859.png", 
+      text: "Estimate Points",
+      callback: function (t) {
+        return t.popup({
+          title: "Select Story Points",
+          url: "./points.html", // Points to your custom UI
+          height: 240
+        });
+      }
+    }];
+  },
+
   "card-badges": function (t) {
-    return t.card("idShort").then(function(card) {
-      return [{
-        text: "#" + card.idShort,
-        color: "blue"
-      }];
+    return Promise.all([
+      t.get('card', 'shared', 'storyPoints'),
+      t.card("labels")
+    ]).then(function([points, card]) {
+      const badges = [];
+
+      if (points) {
+        badges.push({ text: "🔢 " + points + " Pts", color: "blue" });
+      }
+
+      if (card.labels && card.labels.length > 0) {
+        card.labels.forEach(label => {
+          const labelName = label.name.toLowerCase();
+          if (labelName.includes("urgent")) badges.push({ text: "🚨 URGENT", color: "red" });
+          else if (labelName.includes("low priority")) badges.push({ text: "🔽 LOW PRIORITY", color: "sky" });
+        });
+      }
+      return badges;
     });
   }
 
 });
 </script>
-
 </body>
 </html>
