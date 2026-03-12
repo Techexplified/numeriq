@@ -9,23 +9,38 @@
 <script>
 window.TrelloPowerUp.initialize({
 
+  // 1. BOARD BUTTONS (Stats Popup AND Instant Toggle)
   "board-buttons": function (t) {
-    return [{
-      icon: {
-        light: "https://cdn-icons-png.flaticon.com/512/709/709612.png",
-        dark: "https://cdn-icons-png.flaticon.com/512/709/709612.png"
-      },
-      text: "Numeriq",
-      callback: function (t) {
-        return t.popup({
-          title: "Numeriq Stats",
-          url: "./index.html", 
-          height: 350
-        });
-      }
-    }];
+    return t.get('board', 'shared', 'showBadges', true).then(function(showBadges) {
+      return [
+        {
+          // Button 1: Opens your new Data Table
+          icon: {
+            light: "https://cdn-icons-png.flaticon.com/512/709/709612.png",
+            dark: "https://cdn-icons-png.flaticon.com/512/709/709612.png"
+          },
+          text: "Numeriq Stats",
+          callback: function (t) {
+            return t.popup({
+              title: "Board Summary",
+              url: "./index.html", 
+              height: 400 // Made taller to fit the table
+            });
+          }
+        },
+        {
+          // Button 2: The Instant On/Off Toggle!
+          icon: "https://cdn-icons-png.flaticon.com/512/5968/5968756.png",
+          text: showBadges ? "Hide #s" : "Show #s",
+          callback: function (t) {
+            return t.set('board', 'shared', 'showBadges', !showBadges);
+          }
+        }
+      ];
+    });
   },
 
+  // 2. CARD BUTTONS (For Story Points)
   "card-buttons": function (t) {
     return [{
       icon: "https://cdn-icons-png.flaticon.com/512/1828/1828859.png", 
@@ -40,34 +55,30 @@ window.TrelloPowerUp.initialize({
     }];
   },
 
+  // 3. CARD BADGES (Numbers, Points, and Labels)
   "card-badges": function (t) {
-    // We need to fetch: 
-    // 1. storyPoints (our custom data)
-    // 2. idShort (the #number)
-    // 3. labels (for Urgent/Low Priority)
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
-      t.card("idShort", "labels")
-    ]).then(function([points, card]) {
+      t.card("idShort", "labels"),
+      t.get('board', 'shared', 'showBadges', true) // Check the toggle status
+    ]).then(function([points, card, showBadges]) {
       const badges = [];
 
-      // 1. ADD THE #NUMBER (Blue Badge)
-      if (card.idShort) {
+      // Only add the # number if the toggle is ON
+      if (card.idShort && showBadges !== false) {
         badges.push({
           text: "#" + card.idShort,
           color: "blue"
         });
       }
 
-      // 2. ADD THE STORY POINTS (Score)
       if (points) {
         badges.push({ 
           text: "🔢 " + points + " Pts", 
-          color: "purple" // Purple makes it stand out from the ID
+          color: "purple" 
         });
       }
 
-      // 3. ADD THE LABELS (Urgent/Low Priority)
       if (card.labels && card.labels.length > 0) {
         card.labels.forEach(label => {
           const labelName = label.name.toLowerCase();
