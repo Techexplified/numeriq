@@ -1,40 +1,51 @@
 /* App.css */
+
+/* 1. Ensure padding doesn't push elements off-screen */
+* {
+  box-sizing: border-box;
+}
+
 .dashboard-wrapper {
-  padding: 30px;
+  padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: #f4f5f7;
   min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden; /* Hard block on horizontal page scrolling */
 }
 
 .table-container {
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  overflow: hidden;
   margin-bottom: 40px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .numeriq-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 14px;
+  font-size: 13px;
+  /* 2. Force the table to perfectly fit the window width */
+  table-layout: fixed; 
+  word-wrap: break-word; /* Force long titles to wrap */
+}
+
+.numeriq-table th, .numeriq-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ebecf0;
+  vertical-align: top; /* Keeps text aligned nicely when wrapped */
 }
 
 .numeriq-table th {
   background-color: #fafbfc;
   color: #5e6c84;
-  padding: 15px 20px;
   font-weight: 600;
   border-bottom: 2px solid #dfe1e6;
   text-transform: uppercase;
-  font-size: 12px;
-}
-
-.numeriq-table td {
-  padding: 15px 20px;
-  border-bottom: 1px solid #ebecf0;
-  color: #172b4d;
+  font-size: 11px;
 }
 
 .numeriq-table tbody tr:hover {
