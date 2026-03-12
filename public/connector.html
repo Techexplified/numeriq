@@ -7,17 +7,20 @@
 </head>
 <body>
 <script>
+// Pure White SVG for the Bar Chart (Stats Dashboard)
+var DASHBOARD_ICON = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M4 20h16v2H4zM16 8h3v10h-3zM10.5 4h3v14h-3zM5 12h3v6H5z'/%3E%3C/svg%3E";
+
+// Pure White SVG for the Hashtag (Toggle Numbers)
+var HASHTAG_ICON = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M11 4h2v4h4v2h-4v4h4v2h-4v4h-2v-4H7v4H5v-4H1v-2h4v-4H1V8h4V4h2v4h4V4zm-4 6v4h4v-4H7z'/%3E%3C/svg%3E";
+
 window.TrelloPowerUp.initialize({
 
-  // 1. BOARD BUTTONS (Stats Modal AND Instant Toggle)
+  // 1. BOARD BUTTONS
   "board-buttons": function (t) {
     return t.get('board', 'shared', 'showBadges', true).then(function(showBadges) {
       return [
         {
-          icon: {
-            light: "https://cdn-icons-png.flaticon.com/512/709/709612.png",
-            dark: "https://cdn-icons-png.flaticon.com/512/709/709612.png"
-          },
+          icon: DASHBOARD_ICON,
           text: "Numeriq Stats",
           callback: function (t) {
             return t.modal({
@@ -28,7 +31,7 @@ window.TrelloPowerUp.initialize({
           }
         },
         {
-          icon: "https://cdn-icons-png.flaticon.com/512/5968/5968756.png",
+          icon: HASHTAG_ICON,
           text: showBadges ? "Hide #s" : "Show #s",
           callback: function (t) {
             return t.set('board', 'shared', 'showBadges', !showBadges);
@@ -38,10 +41,10 @@ window.TrelloPowerUp.initialize({
     });
   },
 
-  // 2. CARD BADGES (Strictly just the # numbers)
+  // 2. CARD BADGES
   "card-badges": function (t) {
     return Promise.all([
-      t.card("idShort"), // Only asking Trello for the ID number now
+      t.card("idShort"), 
       t.get('board', 'shared', 'showBadges', true) 
     ]).then(function([card, showBadges]) {
       
