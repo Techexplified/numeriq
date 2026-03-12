@@ -9,6 +9,7 @@
 <script>
 window.TrelloPowerUp.initialize({
 
+  // 1. BOARD BUTTONS (Stats Modal AND Instant Toggle)
   "board-buttons": function (t) {
     return t.get('board', 'shared', 'showBadges', true).then(function(showBadges) {
       return [
@@ -19,11 +20,10 @@ window.TrelloPowerUp.initialize({
           },
           text: "Numeriq Stats",
           callback: function (t) {
-            // NEW: t.modal creates a massive dashboard instead of a tiny popup!
             return t.modal({
               title: "Numeriq Board Dashboard",
               url: "./index.html", 
-              fullscreen: false // Setting this to true would make it 100% of the screen!
+              fullscreen: false 
             });
           }
         },
@@ -38,32 +38,23 @@ window.TrelloPowerUp.initialize({
     });
   },
 
-  "card-buttons": function (t) {
-    return [{
-      icon: "https://cdn-icons-png.flaticon.com/512/1828/1828859.png", 
-      text: "Estimate Points",
-      callback: function (t) {
-        return t.popup({ title: "Select Story Points", url: "./points.html", height: 240 });
-      }
-    }];
-  },
-
+  // 2. CARD BADGES (Strictly just the # numbers)
   "card-badges": function (t) {
     return Promise.all([
-      t.get('card', 'shared', 'storyPoints'),
-      t.card("idShort", "labels"),
-      t.get('board', 'shared', 'showBadges', true)
-    ]).then(function([points, card, showBadges]) {
+      t.card("idShort"), // Only asking Trello for the ID number now
+      t.get('board', 'shared', 'showBadges', true) 
+    ]).then(function([card, showBadges]) {
+      
       const badges = [];
-      if (card.idShort && showBadges !== false) badges.push({ text: "#" + card.idShort, color: "blue" });
-      if (points) badges.push({ text: "🔢 " + points + " Pts", color: "purple" });
-      if (card.labels && card.labels.length > 0) {
-        card.labels.forEach(label => {
-          const l = label.name.toLowerCase();
-          if (l.includes("urgent")) badges.push({ text: "🚨 URGENT", color: "red" });
-          else if (l.includes("low priority")) badges.push({ text: "🔽 LOW PRIORITY", color: "sky" });
+
+      // Add the # number if the toggle is ON
+      if (card.idShort && showBadges !== false) {
+        badges.push({
+          text: "#" + card.idShort,
+          color: "blue"
         });
       }
+      
       return badges;
     });
   }
