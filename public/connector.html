@@ -9,27 +9,25 @@
 <script>
 window.TrelloPowerUp.initialize({
 
-  // 1. BOARD BUTTONS (Stats Popup AND Instant Toggle)
   "board-buttons": function (t) {
     return t.get('board', 'shared', 'showBadges', true).then(function(showBadges) {
       return [
         {
-          // Button 1: Opens your new Data Table
           icon: {
             light: "https://cdn-icons-png.flaticon.com/512/709/709612.png",
             dark: "https://cdn-icons-png.flaticon.com/512/709/709612.png"
           },
           text: "Numeriq Stats",
           callback: function (t) {
-            return t.popup({
-              title: "Board Summary",
+            // NEW: t.modal creates a massive dashboard instead of a tiny popup!
+            return t.modal({
+              title: "Numeriq Board Dashboard",
               url: "./index.html", 
-              height: 400 // Made taller to fit the table
+              fullscreen: false // Setting this to true would make it 100% of the screen!
             });
           }
         },
         {
-          // Button 2: The Instant On/Off Toggle!
           icon: "https://cdn-icons-png.flaticon.com/512/5968/5968756.png",
           text: showBadges ? "Hide #s" : "Show #s",
           callback: function (t) {
@@ -40,56 +38,32 @@ window.TrelloPowerUp.initialize({
     });
   },
 
-  // 2. CARD BUTTONS (For Story Points)
   "card-buttons": function (t) {
     return [{
       icon: "https://cdn-icons-png.flaticon.com/512/1828/1828859.png", 
       text: "Estimate Points",
       callback: function (t) {
-        return t.popup({
-          title: "Select Story Points",
-          url: "./points.html",
-          height: 240
-        });
+        return t.popup({ title: "Select Story Points", url: "./points.html", height: 240 });
       }
     }];
   },
 
-  // 3. CARD BADGES (Numbers, Points, and Labels)
   "card-badges": function (t) {
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
       t.card("idShort", "labels"),
-      t.get('board', 'shared', 'showBadges', true) // Check the toggle status
+      t.get('board', 'shared', 'showBadges', true)
     ]).then(function([points, card, showBadges]) {
       const badges = [];
-
-      // Only add the # number if the toggle is ON
-      if (card.idShort && showBadges !== false) {
-        badges.push({
-          text: "#" + card.idShort,
-          color: "blue"
-        });
-      }
-
-      if (points) {
-        badges.push({ 
-          text: "🔢 " + points + " Pts", 
-          color: "purple" 
-        });
-      }
-
+      if (card.idShort && showBadges !== false) badges.push({ text: "#" + card.idShort, color: "blue" });
+      if (points) badges.push({ text: "🔢 " + points + " Pts", color: "purple" });
       if (card.labels && card.labels.length > 0) {
         card.labels.forEach(label => {
-          const labelName = label.name.toLowerCase();
-          if (labelName.includes("urgent")) {
-            badges.push({ text: "🚨 URGENT", color: "red" });
-          } else if (labelName.includes("low priority")) {
-            badges.push({ text: "🔽 LOW PRIORITY", color: "sky" });
-          }
+          const l = label.name.toLowerCase();
+          if (l.includes("urgent")) badges.push({ text: "🚨 URGENT", color: "red" });
+          else if (l.includes("low priority")) badges.push({ text: "🔽 LOW PRIORITY", color: "sky" });
         });
       }
-      
       return badges;
     });
   }
