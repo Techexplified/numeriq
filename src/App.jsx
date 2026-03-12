@@ -6,14 +6,18 @@ import "./App.css";
 function App() {
   const [boardName, setBoardName] = useState("");
   const [totals, setTotals] = useState({ totalCards: 0, completedCards: 0 });
+  
+  // State for both tables
+  const [listData, setListData] = useState([]);
   const [cardsData, setCardsData] = useState([]);
+  
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const t = window.TrelloPowerUp.iframe();
 
     async function loadData() {
-      // Fetch the specific fields we need for the detailed table
+      // Fetch everything we need in one go
       const [board, lists, cards] = await Promise.all([
         t.board("name"),
         t.lists("id", "name"),
@@ -22,21 +26,32 @@ function App() {
 
       setBoardName(board.name);
 
-      // Create a quick lookup map so we can match list IDs to list names
+      let totalCompleted = 0;
       const listMap = {};
-      lists.forEach(list => {
-        listMap[list.id] = list.name;
+
+      // 1. Process Data for the Upper Table (List Summary)
+      const summaryData = lists.map(list => {
+        listMap[list.id] = list.name; // Save this mapping for the detailed table below
+        
+        const cardsInList = cards.filter(card => card.idList === list.id);
+        const completedInList = cardsInList.filter(card => 
+          card.dueComplete || list.name.toLowerCase() === "done"
+        ).length;
+
+        totalCompleted += completedInList;
+
+        return {
+          id: list.id,
+          name: list.name,
+          totalCards: cardsInList.length,
+          completed: completedInList
+        };
       });
 
-      let completedCount = 0;
-
-      // Process each card to format the data for our table
+      // 2. Process Data for the Lower Table (Detailed Analysis)
       const detailedCards = cards.map(card => {
         const listName = listMap[card.idList] || "Unknown List";
-        
-        // A card is 'Done' if the due date is checked off OR if it lives in a "Done" list
         const isDone = card.dueComplete || listName.toLowerCase() === "done";
-        if (isDone) completedCount++;
 
         return {
           id: card.id,
@@ -44,16 +59,17 @@ function App() {
           listName: listName,
           members: card.members || [],
           labels: card.labels || [],
-          // Format the due date nicely, or return a dash if there isn't one
           due: card.due ? new Date(card.due).toLocaleDateString() : "-",
           isDone: isDone
         };
       });
 
+      // Update all React states
+      setListData(summaryData);
       setCardsData(detailedCards);
       setTotals({
         totalCards: cards.length,
-        completedCards: completedCount
+        completedCards: totalCompleted
       });
       setLoading(false);
     }
@@ -61,17 +77,18 @@ function App() {
     loadData();
   }, []);
 
-  if (loading) return <div style={{ padding: "20px", color: "#5e6c84" }}>Loading detailed stats...</div>;
+  if (loading) return <div style={{ padding: "20px", color: "#5e6c84" }}>Loading Numeriq Stats...</div>;
 
   return (
     <div style={{ padding: "15px", fontFamily: "sans-serif" }}>
-      <h2 style={{ margin: "0 0 10px 0", color: "#172b4d" }}>Board Summary</h2>
-      <p style={{ margin: "0 0 15px 0", fontSize: "14px", color: "#5e6c84" }}>
-        {boardName}
+      {/* HEADER */}
+      <h2 style={{ margin: "0 0 5px 0", color: "#172b4d" }}>Numeriq Dashboard</h2>
+      <p style={{ margin: "0 0 20px 0", fontSize: "14px", color: "#5e6c84" }}>
+        Board: <strong>{boardName}</strong>
       </p>
 
-      {/* Top Level Summary Stats */}
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+      {/* TOP LEVEL STATS */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "30px" }}>
         <div style={{ background: "#f4f5f7", padding: "10px", borderRadius: "5px", flex: 1, textAlign: "center" }}>
           <strong style={{ color: "#5e6c84", fontSize: "12px", textTransform: "uppercase" }}>Total Tasks</strong>
           <div style={{ fontSize: "24px", color: "#172b4d", fontWeight: "bold", marginTop: "5px" }}>{totals.totalCards}</div>
@@ -82,52 +99,62 @@ function App() {
         </div>
       </div>
 
-      {/* Detailed Tabular Data */}
+      {/* TABLE 1: LIST SUMMARY (Upper) */}
+      <h3 style={{ fontSize: "16px", color: "#172b4d", borderBottom: "2px solid #dfe1e6", paddingBottom: "5px", marginBottom: "10px" }}>
+        List Summary
+      </h3>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px", marginBottom: "40px" }}>
+        <thead>
+          <tr style={{ textAlign: "left", color: "#5e6c84" }}>
+            <th style={{ padding: "8px", borderBottom: "1px solid #dfe1e6" }}>List Name</th>
+            <th style={{ padding: "8px", textAlign: "center", borderBottom: "1px solid #dfe1e6" }}>Cards</th>
+            <th style={{ padding: "8px", textAlign: "center", borderBottom: "1px solid #dfe1e6" }}>Done</th>
+          </tr>
+        </thead>
+        <tbody>
+          {listData.map(list => (
+            <tr key={list.id} style={{ borderBottom: "1px solid #ebecf0" }}>
+              <td style={{ padding: "8px", fontWeight: "500" }}>{list.name}</td>
+              <td style={{ padding: "8px", textAlign: "center" }}>{list.totalCards}</td>
+              <td style={{ padding: "8px", textAlign: "center", color: list.completed > 0 ? "#006644" : "inherit", fontWeight: list.completed > 0 ? "bold" : "normal" }}>
+                {list.completed}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* TABLE 2: DETAILED ANALYSIS (Lower) */}
+      <h3 style={{ fontSize: "16px", color: "#172b4d", borderBottom: "2px solid #dfe1e6", paddingBottom: "5px", marginBottom: "10px" }}>
+        Detailed Task Analysis
+      </h3>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", textAlign: "left" }}>
           <thead>
-            <tr style={{ borderBottom: "2px solid #dfe1e6", color: "#5e6c84" }}>
-              <th style={{ padding: "10px 8px" }}>Task</th>
-              <th style={{ padding: "10px 8px" }}>List</th>
-              <th style={{ padding: "10px 8px" }}>Members</th>
-              <th style={{ padding: "10px 8px" }}>Labels</th>
-              <th style={{ padding: "10px 8px" }}>Due Date</th>
-              <th style={{ padding: "10px 8px", textAlign: "center" }}>Status</th>
+            <tr style={{ color: "#5e6c84" }}>
+              <th style={{ padding: "10px 8px", borderBottom: "1px solid #dfe1e6" }}>Task</th>
+              <th style={{ padding: "10px 8px", borderBottom: "1px solid #dfe1e6" }}>List</th>
+              <th style={{ padding: "10px 8px", borderBottom: "1px solid #dfe1e6" }}>Members</th>
+              <th style={{ padding: "10px 8px", borderBottom: "1px solid #dfe1e6" }}>Labels</th>
+              <th style={{ padding: "10px 8px", borderBottom: "1px solid #dfe1e6" }}>Due</th>
+              <th style={{ padding: "10px 8px", textAlign: "center", borderBottom: "1px solid #dfe1e6" }}>Status</th>
             </tr>
           </thead>
           <tbody>
             {cardsData.map(card => (
-              <tr key={card.id} style={{ borderBottom: "1px solid #ebecf0" }}>
-                
-                {/* Task Name */}
+              <tr key={card.id} style={{ borderBottom: "1px solid #ebecf0", backgroundColor: card.isDone ? "#fafffa" : "transparent" }}>
                 <td style={{ padding: "10px 8px", fontWeight: "500", color: "#172b4d" }}>{card.name}</td>
-                
-                {/* List Name */}
                 <td style={{ padding: "10px 8px", color: "#5e6c84" }}>{card.listName}</td>
-                
-                {/* Members */}
                 <td style={{ padding: "10px 8px" }}>
                   {card.members.length > 0 
                     ? card.members.map(m => m.fullName).join(", ") 
-                    : <span style={{ color: "#a5adba", fontStyle: "italic" }}>Unassigned</span>}
+                    : <span style={{ color: "#a5adba", fontStyle: "italic" }}>-</span>}
                 </td>
-
-                {/* Labels */}
                 <td style={{ padding: "10px 8px" }}>
                   {card.labels.length > 0 ? (
                     <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
                       {card.labels.map(label => (
-                        <span 
-                          key={label.id} 
-                          style={{ 
-                            backgroundColor: label.color ? label.color : "#091e420f", 
-                            color: label.color ? "#fff" : "#172b4d",
-                            padding: "2px 6px", 
-                            borderRadius: "3px", 
-                            fontSize: "11px",
-                            fontWeight: "bold",
-                            textShadow: label.color ? "0 0 2px rgba(0,0,0,0.3)" : "none" 
-                          }}>
+                        <span key={label.id} style={{ backgroundColor: label.color || "#091e420f", color: label.color ? "#fff" : "#172b4d", padding: "2px 6px", borderRadius: "3px", fontSize: "11px", fontWeight: "bold" }}>
                           {label.name || "Label"}
                         </span>
                       ))}
@@ -136,13 +163,7 @@ function App() {
                     <span style={{ color: "#a5adba" }}>-</span>
                   )}
                 </td>
-
-                {/* Due Date */}
-                <td style={{ padding: "10px 8px", color: card.due !== "-" ? "#172b4d" : "#a5adba" }}>
-                  {card.due}
-                </td>
-
-                {/* Status Badge */}
+                <td style={{ padding: "10px 8px", color: card.due !== "-" ? "#172b4d" : "#a5adba" }}>{card.due}</td>
                 <td style={{ padding: "10px 8px", textAlign: "center" }}>
                   {card.isDone ? (
                     <span style={{ backgroundColor: "#e3fcef", color: "#006644", padding: "4px 8px", borderRadius: "12px", fontSize: "12px", fontWeight: "bold" }}>Done</span>
@@ -150,7 +171,6 @@ function App() {
                     <span style={{ backgroundColor: "#fffae6", color: "#b36200", padding: "4px 8px", borderRadius: "12px", fontSize: "12px", fontWeight: "bold" }}>Pending</span>
                   )}
                 </td>
-                
               </tr>
             ))}
           </tbody>
