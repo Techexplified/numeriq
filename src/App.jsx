@@ -14,7 +14,8 @@ function App() {
   const [filterStatus, setFilterStatus] = useState("All");
   const [filterMember, setFilterMember] = useState("All");
   const [filterLabel, setFilterLabel] = useState("All");
-  const [filterDue, setFilterDue] = useState("All");
+  const [filterDueType, setFilterDueType] = useState("All"); // All, Has Due Date, No Due Date, Specific Date
+  const [filterSpecificDate, setFilterSpecificDate] = useState(""); // Format: YYYY-MM-DD
 
   useEffect(() => {
     const t = window.TrelloPowerUp.iframe();
@@ -68,6 +69,7 @@ function App() {
           members: card.members || [],
           labels: card.labels || [], 
           due: card.due ? new Date(card.due).toLocaleDateString() : "-", 
+          rawDue: card.due ? new Date(card.due) : null, // Added for exact date filtering
           isDone: isDone,
           isOverdue: isOverdue
         };
@@ -102,6 +104,13 @@ function App() {
     window.html2pdf().set(opt).from(element).save();
   };
 
+  // Helper function to get a reliable label name (Trello labels sometimes only have colors)
+  const getLabelName = (label) => {
+    if (label.name) return label.name;
+    if (label.color) return `Color: ${label.color}`;
+    return "Unnamed Label";
+  };
+
   // Extract unique options for dropdowns
   const uniqueMembers = useMemo(() => {
     const members = new Set(cardsData.flatMap(card => card.members.map(m => m.fullName)));
@@ -109,7 +118,7 @@ function App() {
   }, [cardsData]);
 
   const uniqueLabels = useMemo(() => {
-    const labels = new Set(cardsData.flatMap(card => card.labels.map(l => l.name || "Unnamed Label")));
+    const labels = new Set(cardsData.flatMap(card => card.labels.map(l => getLabelName(l))));
     return Array.from(labels).sort();
   }, [cardsData]);
 
@@ -132,18 +141,31 @@ function App() {
       // 3. Label Filter
       if (filterLabel !== "All") {
         if (filterLabel === "No Label" && card.labels.length > 0) return false;
-        if (filterLabel !== "No Label" && !card.labels.some(l => (l.name || "Unnamed Label") === filterLabel)) return false;
+        if (filterLabel !== "No Label" && !card.labels.some(l => getLabelName(l) === filterLabel)) return false;
       }
 
       // 4. Due Date Filter
-      if (filterDue !== "All") {
-        if (filterDue === "Has Due Date" && card.due === "-") return false;
-        if (filterDue === "No Due Date" && card.due !== "-") return false;
+      if (filterDueType !== "All") {
+        if (filterDueType === "Has Due Date" && card.due === "-") return false;
+        if (filterDueType === "No Due Date" && card.due !== "-") return false;
+        if (filterDueType === "Specific Date" && filterSpecificDate) {
+          if (!card.rawDue) return false;
+          
+          // Compare year, month, and day safely
+          const [year, month, day] = filterSpecificDate.split('-');
+          if (
+            card.rawDue.getFullYear() !== parseInt(year) ||
+            (card.rawDue.getMonth() + 1) !== parseInt(month) ||
+            card.rawDue.getDate() !== parseInt(day)
+          ) {
+            return false;
+          }
+        }
       }
 
       return true;
     });
-  }, [cardsData, filterStatus, filterMember, filterLabel, filterDue]);
+  }, [cardsData, filterStatus, filterMember, filterLabel, filterDueType, filterSpecificDate]);
 
 
   if (loading) {
@@ -264,11 +286,23 @@ function App() {
                 {uniqueLabels.map(l => <option key={l} value={l}>{l}</option>)}
               </select>
 
-              <select style={selectStyle} value={filterDue} onChange={e => setFilterDue(e.target.value)}>
-                <option value="All">Due Date: All</option>
-                <option value="Has Due Date">Has Due Date</option>
-                <option value="No Due Date">No Due Date</option>
-              </select>
+              <div style={{ display: "flex", gap: "4px" }}>
+                <select style={selectStyle} value={filterDueType} onChange={e => setFilterDueType(e.target.value)}>
+                  <option value="All">Due Date: All</option>
+                  <option value="Has Due Date">Has Due Date</option>
+                  <option value="No Due Date">No Due Date</option>
+                  <option value="Specific Date">Specific Date...</option>
+                </select>
+
+                {filterDueType === "Specific Date" && (
+                  <input 
+                    type="date" 
+                    style={selectStyle}
+                    value={filterSpecificDate}
+                    onChange={e => setFilterSpecificDate(e.target.value)}
+                  />
+                )}
+              </div>
             </div>
           </div>
 
