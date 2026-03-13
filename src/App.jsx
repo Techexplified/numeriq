@@ -91,7 +91,7 @@ function App() {
     const element = document.getElementById("pdf-content");
     const opt = {
       margin: 0.3,
-      filename: `${boardName}_Numeriq_Report.pdf`,
+      filename: `${boardName}_Summify_Report.pdf`,
       image: { type: "jpeg", quality: 1 },
       html2canvas: { 
         scale: 2, 
@@ -171,7 +171,7 @@ function App() {
   if (loading) {
     return (
       <div style={{ padding: "20px", textAlign: "center", color: "#5e6c84", fontFamily: "sans-serif" }}>
-        <div style={{ fontSize: "14px", fontWeight: "500" }}>Loading Numeriq Stats...</div>
+        <div style={{ fontSize: "14px", fontWeight: "500" }}>Loading Summify Stats...</div>
       </div>
     );
   }
@@ -194,7 +194,7 @@ function App() {
       {/* HEADER */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "10px", backgroundColor: "#fff", padding: "10px 15px", borderRadius: "6px", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }}>
         <div>
-          <h2 style={{ margin: "0 0 2px 0", color: "#172b4d", fontSize: "16px", fontWeight: "600" }}>Numeriq Dashboard</h2>
+          <h2 style={{ margin: "0 0 2px 0", color: "#172b4d", fontSize: "16px", fontWeight: "600" }}>Summify Dashboard</h2>
           <p style={{ margin: "0", fontSize: "11px", color: "#5e6c84" }}>Board: <strong style={{ color: "#172b4d" }}>{boardName}</strong></p>
         </div>
         <button 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Numeriq Connector</title>
+  <title>Summify Connector</title>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
 </head>
 <body>
@@ -21,10 +21,10 @@ window.TrelloPowerUp.initialize({
       return [
         {
           icon: DASHBOARD_ICON,
-          text: "Numeriq Stats",
+          text: "Summify Stats",
           callback: function (t) {
             return t.modal({
-              title: "Numeriq Board Dashboard",
+              title: "Summify Dashboard",
               url: "./index.html", 
               fullscreen: true // <-- THIS IS THE FIX!
             });
