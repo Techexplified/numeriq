@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import "./App.css";
 
 /* global TrelloPowerUp */
@@ -9,6 +9,12 @@ function App() {
   const [listData, setListData] = useState([]);
   const [cardsData, setCardsData] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Filter States
+  const [filterStatus, setFilterStatus] = useState("All");
+  const [filterMember, setFilterMember] = useState("All");
+  const [filterLabel, setFilterLabel] = useState("All");
+  const [filterDue, setFilterDue] = useState("All");
 
   useEffect(() => {
     const t = window.TrelloPowerUp.iframe();
@@ -96,6 +102,50 @@ function App() {
     window.html2pdf().set(opt).from(element).save();
   };
 
+  // Extract unique options for dropdowns
+  const uniqueMembers = useMemo(() => {
+    const members = new Set(cardsData.flatMap(card => card.members.map(m => m.fullName)));
+    return Array.from(members).sort();
+  }, [cardsData]);
+
+  const uniqueLabels = useMemo(() => {
+    const labels = new Set(cardsData.flatMap(card => card.labels.map(l => l.name || "Unnamed Label")));
+    return Array.from(labels).sort();
+  }, [cardsData]);
+
+  // Apply Filters to Detailed Cards
+  const filteredCards = useMemo(() => {
+    return cardsData.filter(card => {
+      // 1. Status Filter
+      if (filterStatus !== "All") {
+        if (filterStatus === "Done" && !card.isDone) return false;
+        if (filterStatus === "Overdue" && (!card.isOverdue || card.isDone)) return false;
+        if (filterStatus === "Pending" && (card.isDone || card.isOverdue)) return false;
+      }
+
+      // 2. Member Filter
+      if (filterMember !== "All") {
+        if (filterMember === "Unassigned" && card.members.length > 0) return false;
+        if (filterMember !== "Unassigned" && !card.members.some(m => m.fullName === filterMember)) return false;
+      }
+
+      // 3. Label Filter
+      if (filterLabel !== "All") {
+        if (filterLabel === "No Label" && card.labels.length > 0) return false;
+        if (filterLabel !== "No Label" && !card.labels.some(l => (l.name || "Unnamed Label") === filterLabel)) return false;
+      }
+
+      // 4. Due Date Filter
+      if (filterDue !== "All") {
+        if (filterDue === "Has Due Date" && card.due === "-") return false;
+        if (filterDue === "No Due Date" && card.due !== "-") return false;
+      }
+
+      return true;
+    });
+  }, [cardsData, filterStatus, filterMember, filterLabel, filterDue]);
+
+
   if (loading) {
     return (
       <div style={{ padding: "20px", textAlign: "center", color: "#5e6c84", fontFamily: "sans-serif" }}>
@@ -103,6 +153,18 @@ function App() {
       </div>
     );
   }
+
+  // Helper styles for dropdowns
+  const selectStyle = {
+    padding: "4px 8px", 
+    fontSize: "11px", 
+    borderRadius: "4px", 
+    border: "1px solid #dfe1e6", 
+    backgroundColor: "#fafbfc", 
+    color: "#172b4d",
+    outline: "none",
+    cursor: "pointer"
+  };
 
   return (
     <div className="dashboard-wrapper" style={{ fontFamily: "'-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", fontSize: "12px", color: "#172b4d", padding: "10px", backgroundColor: "#f4f5f7", minHeight: "100vh" }}>
@@ -173,9 +235,43 @@ function App() {
           </div>
         </div>
 
-        {/* DETAILED ANALYSIS TABLE */}
+        {/* DETAILED ANALYSIS TABLE WITH FILTERS */}
         <div style={{ background: "white", borderRadius: "6px", padding: "12px 15px", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }}>
-          <h3 style={{ fontSize: "14px", color: "#172b4d", marginBottom: "10px", marginTop: "0", fontWeight: "600" }}>Detailed Task Analysis</h3>
+          
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", marginBottom: "10px" }}>
+            <h3 style={{ fontSize: "14px", color: "#172b4d", margin: "0", fontWeight: "600" }}>Detailed Task Analysis</h3>
+            
+            {/* FILTER BAR */}
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+              <span style={{ fontSize: "11px", color: "#5e6c84", fontWeight: "600" }}>Filters:</span>
+              
+              <select style={selectStyle} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+                <option value="All">Status: All</option>
+                <option value="Done">Done</option>
+                <option value="Overdue">Overdue</option>
+                <option value="Pending">Pending</option>
+              </select>
+
+              <select style={selectStyle} value={filterMember} onChange={e => setFilterMember(e.target.value)}>
+                <option value="All">Member: All</option>
+                <option value="Unassigned">Unassigned</option>
+                {uniqueMembers.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+
+              <select style={selectStyle} value={filterLabel} onChange={e => setFilterLabel(e.target.value)}>
+                <option value="All">Label: All</option>
+                <option value="No Label">No Label</option>
+                {uniqueLabels.map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+
+              <select style={selectStyle} value={filterDue} onChange={e => setFilterDue(e.target.value)}>
+                <option value="All">Due Date: All</option>
+                <option value="Has Due Date">Has Due Date</option>
+                <option value="No Due Date">No Due Date</option>
+              </select>
+            </div>
+          </div>
+
           <div className="table-container" style={{ overflowX: "auto" }}>
             <table className="numeriq-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
               <thead>
@@ -189,42 +285,50 @@ function App() {
                 </tr>
               </thead>
               <tbody>
-                {cardsData.map(card => (
-                  <tr key={card.id} style={{ backgroundColor: card.isDone ? "#fafffa" : card.isOverdue ? "#fff5f5" : "transparent", borderBottom: "1px solid #dfe1e6" }}>
-                    <td style={{ fontWeight: "500", padding: "6px 8px" }}>{card.name}</td>
-                    <td style={{ padding: "6px 8px" }}>{card.listName}</td>
-                    <td style={{ padding: "6px 8px" }}>
-                      {card.members.length > 0 
-                        ? card.members.map(m => m.fullName).join(", ") 
-                        : <span style={{ color: "#a5adba", fontStyle: "italic" }}>Unassigned</span>}
-                    </td>
-                    <td style={{ padding: "6px 8px" }}>
-                      {card.labels.length > 0 ? (
-                        <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
-                          {card.labels.map(label => (
-                            <span key={label.id} style={{ backgroundColor: label.color || "#ebecf0", color: label.color ? "#fff" : "#172b4d", padding: "1px 4px", borderRadius: "3px", fontSize: "10px", fontWeight: "600" }}>
-                              {label.name || "Label"}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span style={{ color: "#a5adba" }}>-</span>
-                      )}
-                    </td>
-                    <td style={{ padding: "6px 8px", color: card.isOverdue ? "#bf2600" : (card.due !== "-" ? "#172b4d" : "#a5adba"), fontWeight: card.isOverdue ? "600" : "normal" }}>
-                      {card.due}
-                    </td>
-                    <td style={{ textAlign: "center", padding: "6px 8px" }}>
-                      {card.isDone ? (
-                        <span style={{ backgroundColor: "#e3fcef", color: "#006644", padding: "2px 6px", borderRadius: "10px", fontSize: "10px", fontWeight: "700", display: "inline-block" }}>DONE</span>
-                      ) : card.isOverdue ? (
-                        <span style={{ backgroundColor: "#ffebe6", color: "#bf2600", padding: "2px 6px", borderRadius: "10px", fontSize: "10px", fontWeight: "700", display: "inline-block" }}>OVERDUE</span>
-                      ) : (
-                        <span style={{ backgroundColor: "#fffae6", color: "#b36200", padding: "2px 6px", borderRadius: "10px", fontSize: "10px", fontWeight: "700", display: "inline-block" }}>PENDING</span>
-                      )}
+                {filteredCards.length > 0 ? (
+                  filteredCards.map(card => (
+                    <tr key={card.id} style={{ backgroundColor: card.isDone ? "#fafffa" : card.isOverdue ? "#fff5f5" : "transparent", borderBottom: "1px solid #dfe1e6" }}>
+                      <td style={{ fontWeight: "500", padding: "6px 8px" }}>{card.name}</td>
+                      <td style={{ padding: "6px 8px" }}>{card.listName}</td>
+                      <td style={{ padding: "6px 8px" }}>
+                        {card.members.length > 0 
+                          ? card.members.map(m => m.fullName).join(", ") 
+                          : <span style={{ color: "#a5adba", fontStyle: "italic" }}>Unassigned</span>}
+                      </td>
+                      <td style={{ padding: "6px 8px" }}>
+                        {card.labels.length > 0 ? (
+                          <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+                            {card.labels.map(label => (
+                              <span key={label.id} style={{ backgroundColor: label.color || "#ebecf0", color: label.color ? "#fff" : "#172b4d", padding: "1px 4px", borderRadius: "3px", fontSize: "10px", fontWeight: "600" }}>
+                                {label.name || "Label"}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span style={{ color: "#a5adba" }}>-</span>
+                        )}
+                      </td>
+                      <td style={{ padding: "6px 8px", color: card.isOverdue ? "#bf2600" : (card.due !== "-" ? "#172b4d" : "#a5adba"), fontWeight: card.isOverdue ? "600" : "normal" }}>
+                        {card.due}
+                      </td>
+                      <td style={{ textAlign: "center", padding: "6px 8px" }}>
+                        {card.isDone ? (
+                          <span style={{ backgroundColor: "#e3fcef", color: "#006644", padding: "2px 6px", borderRadius: "10px", fontSize: "10px", fontWeight: "700", display: "inline-block" }}>DONE</span>
+                        ) : card.isOverdue ? (
+                          <span style={{ backgroundColor: "#ffebe6", color: "#bf2600", padding: "2px 6px", borderRadius: "10px", fontSize: "10px", fontWeight: "700", display: "inline-block" }}>OVERDUE</span>
+                        ) : (
+                          <span style={{ backgroundColor: "#fffae6", color: "#b36200", padding: "2px 6px", borderRadius: "10px", fontSize: "10px", fontWeight: "700", display: "inline-block" }}>PENDING</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: "center", padding: "20px", color: "#5e6c84" }}>
+                      No tasks match the selected filters.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
