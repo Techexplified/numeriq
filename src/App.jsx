@@ -1,4 +1,18 @@
 import { useEffect, useState, useMemo } from "react";
+import {
+  LayoutDashboard,
+  ClipboardList,
+  CheckCircle2,
+  AlertTriangle,
+  FolderKanban,
+  Search,
+  Download,
+  User,
+  Moon,
+  Sun,
+  Clock3,
+} from "lucide-react";
+
 import "./App.css";
 
 /* global TrelloPowerUp */
@@ -10,6 +24,7 @@ function App() {
     completedCards: 0,
     overdueCards: 0,
   });
+
   const [listData, setListData] = useState([]);
   const [cardsData, setCardsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,8 +63,10 @@ function App() {
       ]);
 
       setBoardName(board.name);
+
       let totalCompleted = 0;
       let totalOverdue = 0;
+
       const listMap = {};
       const now = new Date();
 
@@ -228,6 +245,7 @@ function App() {
     return (
       <div className="sw-loading">
         <div className="sw-spinner" />
+
         <div className="sw-loading-txt">Loading Summify Stats…</div>
       </div>
     );
@@ -238,7 +256,9 @@ function App() {
       {/* HEADER */}
       <header className="sw-header">
         <div className="sw-brand">
-          <div className="sw-logo">📊</div>
+          <div className="sw-logo">
+            <LayoutDashboard size={18} />
+          </div>
 
           <div>
             <div className="sw-title">Summify Dashboard</div>
@@ -256,25 +276,12 @@ function App() {
             onClick={toggleTheme}
             title="Toggle theme"
           >
-            {theme === "light" ? "🌙" : "☀️"}
+            {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
           </button>
 
           {/* Download PDF */}
           <button className="sw-btn-dl" onClick={downloadPDF}>
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
+            <Download size={14} />
             Download PDF
           </button>
         </div>
@@ -284,7 +291,9 @@ function App() {
         {/* STATS */}
         <div className="sw-stats">
           <div className="sw-stat s-blue">
-            <div className="sw-stat-icon">📋</div>
+            <div className="sw-stat-icon">
+              <ClipboardList size={16} />
+            </div>
 
             <div className="sw-stat-label">Total Tasks</div>
 
@@ -292,7 +301,9 @@ function App() {
           </div>
 
           <div className="sw-stat s-green">
-            <div className="sw-stat-icon">✅</div>
+            <div className="sw-stat-icon">
+              <CheckCircle2 size={16} />
+            </div>
 
             <div className="sw-stat-label">Completed</div>
 
@@ -300,7 +311,9 @@ function App() {
           </div>
 
           <div className="sw-stat s-red">
-            <div className="sw-stat-icon">⚠️</div>
+            <div className="sw-stat-icon">
+              <AlertTriangle size={16} />
+            </div>
 
             <div className="sw-stat-label">Running Late</div>
 
@@ -311,7 +324,9 @@ function App() {
         {/* LIST SUMMARY */}
         <div className="sw-card">
           <div className="sw-section-title">
-            <span className="sw-section-icon">📂</span>
+            <span className="sw-section-icon">
+              <FolderKanban size={13} />
+            </span>
             List Summary
           </div>
 
@@ -366,7 +381,9 @@ function App() {
         <div className="sw-card">
           <div className="sw-card-header">
             <div className="sw-section-title" style={{ marginBottom: 0 }}>
-              <span className="sw-section-icon">🔍</span>
+              <span className="sw-section-icon">
+                <Search size={13} />
+              </span>
               Detailed Task Analysis
             </div>
 
@@ -496,7 +513,8 @@ function App() {
                         {card.members.length > 0 ? (
                           card.members.map((m) => (
                             <span key={m.id} className="sw-member-chip">
-                              👤 {m.fullName}
+                              <User size={11} />
+                              {m.fullName}
                             </span>
                           ))
                         ) : (
@@ -540,6 +558,14 @@ function App() {
                               card.isOverdue ? "sw-due-over" : "sw-due-norm"
                             }
                           >
+                            <Clock3
+                              size={11}
+                              style={{
+                                marginRight: "4px",
+                                verticalAlign: "middle",
+                              }}
+                            />
+
                             {card.due}
                           </span>
                         )}
@@ -547,11 +573,20 @@ function App() {
 
                       <td className="tc">
                         {card.isDone ? (
-                          <span className="sw-badge b-done">✓ Done</span>
+                          <span className="sw-badge b-done">
+                            <CheckCircle2 size={11} />
+                            Done
+                          </span>
                         ) : card.isOverdue ? (
-                          <span className="sw-badge b-over">⚠ Overdue</span>
+                          <span className="sw-badge b-over">
+                            <AlertTriangle size={11} />
+                            Overdue
+                          </span>
                         ) : (
-                          <span className="sw-badge b-pend">◷ Pending</span>
+                          <span className="sw-badge b-pend">
+                            <Clock3 size={11} />
+                            Pending
+                          </span>
                         )}
                       </td>
                     </tr>
