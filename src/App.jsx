@@ -13,13 +13,21 @@ function App() {
   const [listData, setListData] = useState([]);
   const [cardsData, setCardsData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState("light");
 
   // Filter States
   const [filterStatus, setFilterStatus] = useState("All");
   const [filterMember, setFilterMember] = useState("All");
   const [filterLabel, setFilterLabel] = useState("All");
-  const [filterDueType, setFilterDueType] = useState("All"); // All, Has Due Date, No Due Date, Specific Date
-  const [filterSpecificDate, setFilterSpecificDate] = useState(""); // Format: YYYY-MM-DD
+  const [filterDueType, setFilterDueType] = useState("All");
+  const [filterSpecificDate, setFilterSpecificDate] = useState("");
+
+  // Apply theme to document root
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
 
   useEffect(() => {
     const t = window.TrelloPowerUp.iframe();
@@ -51,7 +59,6 @@ function App() {
         const completedInList = cardsInList.filter(
           (card) => card.dueComplete || list.name.toLowerCase() === "done",
         ).length;
-
         const pendingInList = cardsInList.length - completedInList;
         totalCompleted += completedInList;
 
@@ -81,7 +88,7 @@ function App() {
           members: card.members || [],
           labels: card.labels || [],
           due: card.due ? new Date(card.due).toLocaleDateString() : "-",
-          rawDue: card.due ? new Date(card.due) : null, // Added for exact date filtering
+          rawDue: card.due ? new Date(card.due) : null,
           isDone: isDone,
           isOverdue: isOverdue,
         };
@@ -116,14 +123,12 @@ function App() {
     window.html2pdf().set(opt).from(element).save();
   };
 
-  // Helper function to get a reliable label name (Trello labels sometimes only have colors)
   const getLabelName = (label) => {
     if (label.name) return label.name;
     if (label.color) return `Color: ${label.color}`;
     return "Unnamed Label";
   };
 
-  // Extract unique options for dropdowns
   const uniqueMembers = useMemo(() => {
     const members = new Set(
       cardsData.flatMap((card) => card.members.map((m) => m.fullName)),
@@ -138,10 +143,8 @@ function App() {
     return Array.from(labels).sort();
   }, [cardsData]);
 
-  // Apply Filters to Detailed Cards
   const filteredCards = useMemo(() => {
     return cardsData.filter((card) => {
-      // 1. Status Filter
       if (filterStatus !== "All") {
         if (filterStatus === "Done" && !card.isDone) return false;
         if (filterStatus === "Overdue" && (!card.isOverdue || card.isDone))
@@ -150,7 +153,6 @@ function App() {
           return false;
       }
 
-      // 2. Member Filter
       if (filterMember !== "All") {
         if (filterMember === "Unassigned" && card.members.length > 0)
           return false;
@@ -161,7 +163,6 @@ function App() {
           return false;
       }
 
-      // 3. Label Filter
       if (filterLabel !== "All") {
         if (filterLabel === "No Label" && card.labels.length > 0) return false;
         if (
@@ -171,14 +172,11 @@ function App() {
           return false;
       }
 
-      // 4. Due Date Filter
       if (filterDueType !== "All") {
         if (filterDueType === "Has Due Date" && card.due === "-") return false;
         if (filterDueType === "No Due Date" && card.due !== "-") return false;
         if (filterDueType === "Specific Date" && filterSpecificDate) {
           if (!card.rawDue) return false;
-
-          // Compare year, month, and day safely
           const [year, month, day] = filterSpecificDate.split("-");
           if (
             card.rawDue.getFullYear() !== parseInt(year) ||
@@ -203,314 +201,114 @@ function App() {
 
   if (loading) {
     return (
-      <div
-        style={{
-          padding: "20px",
-          textAlign: "center",
-          color: "#5e6c84",
-          fontFamily: "sans-serif",
-        }}
-      >
-        <div style={{ fontSize: "14px", fontWeight: "500" }}>
-          Loading Summify Stats...
-        </div>
+      <div className="loading-screen">
+        <div className="loading-spinner" />
+        <div className="loading-text">Loading Summify Stats…</div>
       </div>
     );
   }
 
-  // Helper styles for dropdowns
-  const selectStyle = {
-    padding: "4px 8px",
-    fontSize: "11px",
-    borderRadius: "4px",
-    border: "1px solid #dfe1e6",
-    backgroundColor: "#fafbfc",
-    color: "#172b4d",
-    outline: "none",
-    cursor: "pointer",
-  };
-
   return (
-    <div
-      className="dashboard-wrapper"
-      style={{
-        fontFamily:
-          "'-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-        fontSize: "12px",
-        color: "#172b4d",
-        padding: "10px",
-        backgroundColor: "#f4f5f7",
-        minHeight: "100vh",
-      }}
-    >
-      {/* HEADER */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "12px",
-          flexWrap: "wrap",
-          gap: "10px",
-          backgroundColor: "#fff",
-          padding: "10px 15px",
-          borderRadius: "6px",
-          boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-        }}
-      >
-        <div>
-          <h2
-            style={{
-              margin: "0 0 2px 0",
-              color: "#172b4d",
-              fontSize: "16px",
-              fontWeight: "600",
-            }}
-          >
-            Summify Dashboard
-          </h2>
-          <p style={{ margin: "0", fontSize: "11px", color: "#5e6c84" }}>
-            Board: <strong style={{ color: "#172b4d" }}>{boardName}</strong>
-          </p>
-        </div>
-        <button
-          onClick={downloadPDF}
-          style={{
-            backgroundColor: "#0052cc",
-            color: "white",
-            padding: "6px 12px",
-            border: "none",
-            borderRadius: "4px",
-            fontWeight: "600",
-            cursor: "pointer",
-            boxShadow: "0 1px 3px rgba(0,82,204,0.2)",
-            whiteSpace: "nowrap",
-            fontSize: "11px",
-            transition: "background-color 0.2s",
-          }}
-        >
-          📥 Download PDF
-        </button>
-      </div>
-
-      <div
-        id="pdf-content"
-        style={{ backgroundColor: "#f4f5f7", paddingBottom: "10px" }}
-      >
-        {/* STATS WIDGETS */}
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            marginBottom: "15px",
-            flexWrap: "wrap",
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              padding: "10px 15px",
-              borderRadius: "6px",
-              flex: "1 1 120px",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-              borderTop: "3px solid #0052cc",
-            }}
-          >
-            <div
-              style={{
-                color: "#5e6c84",
-                fontSize: "10px",
-                textTransform: "uppercase",
-                fontWeight: "600",
-                letterSpacing: "0.5px",
-              }}
-            >
-              Total Tasks
-            </div>
-            <div
-              style={{
-                fontSize: "20px",
-                color: "#172b4d",
-                fontWeight: "700",
-                marginTop: "4px",
-              }}
-            >
-              {totals.totalCards}
-            </div>
-          </div>
-          <div
-            style={{
-              background: "white",
-              padding: "10px 15px",
-              borderRadius: "6px",
-              flex: "1 1 120px",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-              borderTop: "3px solid #006644",
-            }}
-          >
-            <div
-              style={{
-                color: "#5e6c84",
-                fontSize: "10px",
-                textTransform: "uppercase",
-                fontWeight: "600",
-                letterSpacing: "0.5px",
-              }}
-            >
-              Completed
-            </div>
-            <div
-              style={{
-                fontSize: "20px",
-                color: "#006644",
-                fontWeight: "700",
-                marginTop: "4px",
-              }}
-            >
-              {totals.completedCards}
-            </div>
-          </div>
-          <div
-            style={{
-              background: "white",
-              padding: "10px 15px",
-              borderRadius: "6px",
-              flex: "1 1 120px",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-              borderTop: "3px solid #bf2600",
-            }}
-          >
-            <div
-              style={{
-                color: "#5e6c84",
-                fontSize: "10px",
-                textTransform: "uppercase",
-                fontWeight: "600",
-                letterSpacing: "0.5px",
-              }}
-            >
-              Running Late
-            </div>
-            <div
-              style={{
-                fontSize: "20px",
-                color: "#bf2600",
-                fontWeight: "700",
-                marginTop: "4px",
-              }}
-            >
-              {totals.overdueCards}
+    <div className="dashboard-wrapper">
+      {/* ── HEADER ── */}
+      <header className="summify-header">
+        <div className="header-brand">
+          <div className="header-logo">📊</div>
+          <div>
+            <div className="header-title">Summify Dashboard</div>
+            <div className="header-subtitle">
+              Board: <strong>{boardName}</strong>
             </div>
           </div>
         </div>
 
-        {/* LIST SUMMARY TABLE */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: "6px",
-            padding: "12px 15px",
-            boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-            marginBottom: "15px",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: "14px",
-              color: "#172b4d",
-              marginBottom: "10px",
-              marginTop: "0",
-              fontWeight: "600",
-            }}
+        <div className="header-actions">
+          {/* Theme Toggle */}
+          <button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            title="Toggle theme"
           >
+            {theme === "light" ? "🌙" : "☀️"}
+          </button>
+
+          {/* Download PDF */}
+          <button className="btn-download" onClick={downloadPDF}>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Download PDF
+          </button>
+        </div>
+      </header>
+
+      <div id="pdf-content">
+        {/* ── STAT CARDS ── */}
+        <div className="stats-grid">
+          <div className="stat-card blue">
+            <div className="stat-card-icon">📋</div>
+            <div className="stat-label">Total Tasks</div>
+            <div className="stat-value">{totals.totalCards}</div>
+          </div>
+          <div className="stat-card green">
+            <div className="stat-card-icon">✅</div>
+            <div className="stat-label">Completed</div>
+            <div className="stat-value">{totals.completedCards}</div>
+          </div>
+          <div className="stat-card red">
+            <div className="stat-card-icon">⚠️</div>
+            <div className="stat-label">Running Late</div>
+            <div className="stat-value">{totals.overdueCards}</div>
+          </div>
+        </div>
+
+        {/* ── LIST SUMMARY ── */}
+        <div className="section-card">
+          <div className="section-title">
+            <span className="section-title-icon">📂</span>
             List Summary
-          </h3>
-          <div className="table-container" style={{ overflowX: "auto" }}>
-            <table
-              className="numeriq-table"
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontSize: "12px",
-              }}
-            >
+          </div>
+          <div className="table-wrapper">
+            <table className="summify-table">
+              <colgroup>
+                <col style={{ width: "40%" }} />
+                <col style={{ width: "20%" }} />
+                <col style={{ width: "20%" }} />
+                <col style={{ width: "20%" }} />
+              </colgroup>
               <thead>
-                <tr style={{ borderBottom: "2px solid #dfe1e6" }}>
-                  <th
-                    style={{
-                      width: "40%",
-                      textAlign: "left",
-                      padding: "6px 8px",
-                      color: "#5e6c84",
-                      fontWeight: "600",
-                    }}
-                  >
-                    List Name
-                  </th>
-                  <th
-                    style={{
-                      width: "20%",
-                      textAlign: "center",
-                      padding: "6px 8px",
-                      color: "#5e6c84",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Total Cards
-                  </th>
-                  <th
-                    style={{
-                      width: "20%",
-                      textAlign: "center",
-                      padding: "6px 8px",
-                      color: "#5e6c84",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Completed
-                  </th>
-                  <th
-                    style={{
-                      width: "20%",
-                      textAlign: "center",
-                      padding: "6px 8px",
-                      color: "#5e6c84",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Pending
-                  </th>
+                <tr>
+                  <th>List Name</th>
+                  <th className="center">Total Cards</th>
+                  <th className="center">Completed</th>
+                  <th className="center">Pending</th>
                 </tr>
               </thead>
               <tbody>
                 {listData.map((list) => (
-                  <tr
-                    key={list.id}
-                    style={{ borderBottom: "1px solid #dfe1e6" }}
-                  >
-                    <td style={{ fontWeight: "500", padding: "6px 8px" }}>
-                      {list.name}
+                  <tr key={list.id}>
+                    <td>
+                      <span className="task-name">{list.name}</span>
                     </td>
-                    <td style={{ textAlign: "center", padding: "6px 8px" }}>
-                      {list.totalCards}
-                    </td>
+                    <td className="center">{list.totalCards}</td>
                     <td
-                      style={{
-                        textAlign: "center",
-                        padding: "6px 8px",
-                        color: list.completed > 0 ? "#006644" : "inherit",
-                        fontWeight: list.completed > 0 ? "600" : "normal",
-                      }}
+                      className={`center ${list.completed > 0 ? "num-completed" : ""}`}
                     >
                       {list.completed}
                     </td>
                     <td
-                      style={{
-                        textAlign: "center",
-                        padding: "6px 8px",
-                        color: list.pending > 0 ? "#ff991f" : "inherit",
-                        fontWeight: list.pending > 0 ? "600" : "normal",
-                      }}
+                      className={`center ${list.pending > 0 ? "num-pending" : ""}`}
                     >
                       {list.pending}
                     </td>
@@ -521,57 +319,20 @@ function App() {
           </div>
         </div>
 
-        {/* DETAILED ANALYSIS TABLE WITH FILTERS */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: "6px",
-            padding: "12px 15px",
-            boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "10px",
-              marginBottom: "10px",
-            }}
-          >
-            <h3
-              style={{
-                fontSize: "14px",
-                color: "#172b4d",
-                margin: "0",
-                fontWeight: "600",
-              }}
-            >
+        {/* ── DETAILED TASK ANALYSIS ── */}
+        <div className="section-card">
+          <div className="section-header-row">
+            <div className="section-title" style={{ marginBottom: 0 }}>
+              <span className="section-title-icon">🔍</span>
               Detailed Task Analysis
-            </h3>
+            </div>
 
-            {/* FILTER BAR */}
-            <div
-              style={{
-                display: "flex",
-                gap: "8px",
-                flexWrap: "wrap",
-                alignItems: "center",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "11px",
-                  color: "#5e6c84",
-                  fontWeight: "600",
-                }}
-              >
-                Filters:
-              </span>
+            {/* Filter Bar */}
+            <div className="filter-bar">
+              <span className="filter-label">Filters:</span>
 
               <select
-                style={selectStyle}
+                className="filter-select"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
@@ -582,7 +343,7 @@ function App() {
               </select>
 
               <select
-                style={selectStyle}
+                className="filter-select"
                 value={filterMember}
                 onChange={(e) => setFilterMember(e.target.value)}
               >
@@ -596,7 +357,7 @@ function App() {
               </select>
 
               <select
-                style={selectStyle}
+                className="filter-select"
                 value={filterLabel}
                 onChange={(e) => setFilterLabel(e.target.value)}
               >
@@ -609,22 +370,24 @@ function App() {
                 ))}
               </select>
 
-              <div style={{ display: "flex", gap: "4px" }}>
+              <div
+                style={{ display: "flex", gap: "6px", alignItems: "center" }}
+              >
                 <select
-                  style={selectStyle}
+                  className="filter-select"
                   value={filterDueType}
                   onChange={(e) => setFilterDueType(e.target.value)}
                 >
                   <option value="All">Due Date: All</option>
                   <option value="Has Due Date">Has Due Date</option>
                   <option value="No Due Date">No Due Date</option>
-                  <option value="Specific Date">Specific Date...</option>
+                  <option value="Specific Date">Specific Date…</option>
                 </select>
 
                 {filterDueType === "Specific Date" && (
                   <input
                     type="date"
-                    style={selectStyle}
+                    className="filter-date-input"
                     value={filterSpecificDate}
                     onChange={(e) => setFilterSpecificDate(e.target.value)}
                   />
@@ -633,83 +396,24 @@ function App() {
             </div>
           </div>
 
-          <div className="table-container" style={{ overflowX: "auto" }}>
-            <table
-              className="numeriq-table"
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontSize: "12px",
-              }}
-            >
+          <div className="table-wrapper" style={{ marginTop: "14px" }}>
+            <table className="summify-table">
+              <colgroup>
+                <col style={{ width: "25%" }} />
+                <col style={{ width: "14%" }} />
+                <col style={{ width: "20%" }} />
+                <col style={{ width: "14%" }} />
+                <col style={{ width: "12%" }} />
+                <col style={{ width: "15%" }} />
+              </colgroup>
               <thead>
-                <tr style={{ borderBottom: "2px solid #dfe1e6" }}>
-                  <th
-                    style={{
-                      width: "25%",
-                      textAlign: "left",
-                      padding: "6px 8px",
-                      color: "#5e6c84",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Task
-                  </th>
-                  <th
-                    style={{
-                      width: "15%",
-                      textAlign: "left",
-                      padding: "6px 8px",
-                      color: "#5e6c84",
-                      fontWeight: "600",
-                    }}
-                  >
-                    List
-                  </th>
-                  <th
-                    style={{
-                      width: "20%",
-                      textAlign: "left",
-                      padding: "6px 8px",
-                      color: "#5e6c84",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Members
-                  </th>
-                  <th
-                    style={{
-                      width: "15%",
-                      textAlign: "left",
-                      padding: "6px 8px",
-                      color: "#5e6c84",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Labels
-                  </th>
-                  <th
-                    style={{
-                      width: "10%",
-                      textAlign: "left",
-                      padding: "6px 8px",
-                      color: "#5e6c84",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Due Date
-                  </th>
-                  <th
-                    style={{
-                      width: "15%",
-                      textAlign: "center",
-                      padding: "6px 8px",
-                      color: "#5e6c84",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Status
-                  </th>
+                <tr>
+                  <th>Task</th>
+                  <th>List</th>
+                  <th>Members</th>
+                  <th>Labels</th>
+                  <th>Due Date</th>
+                  <th className="center">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -717,49 +421,52 @@ function App() {
                   filteredCards.map((card) => (
                     <tr
                       key={card.id}
-                      style={{
-                        backgroundColor: card.isDone
-                          ? "#fafffa"
+                      className={
+                        card.isDone
+                          ? "row-done"
                           : card.isOverdue
-                            ? "#fff5f5"
-                            : "transparent",
-                        borderBottom: "1px solid #dfe1e6",
-                      }}
+                            ? "row-overdue"
+                            : ""
+                      }
                     >
-                      <td style={{ fontWeight: "500", padding: "6px 8px" }}>
-                        {card.name}
+                      <td>
+                        <span className="task-name">{card.name}</span>
                       </td>
-                      <td style={{ padding: "6px 8px" }}>{card.listName}</td>
-                      <td style={{ padding: "6px 8px" }}>
+
+                      <td>
+                        <span className="list-name-chip">{card.listName}</span>
+                      </td>
+
+                      <td>
                         {card.members.length > 0 ? (
-                          card.members.map((m) => m.fullName).join(", ")
+                          card.members.map((m) => (
+                            <span key={m.id} className="member-chip">
+                              👤 {m.fullName}
+                            </span>
+                          ))
                         ) : (
-                          <span
-                            style={{ color: "#a5adba", fontStyle: "italic" }}
-                          >
-                            Unassigned
-                          </span>
+                          <span className="unassigned-text">Unassigned</span>
                         )}
                       </td>
-                      <td style={{ padding: "6px 8px" }}>
+
+                      <td>
                         {card.labels.length > 0 ? (
                           <div
                             style={{
                               display: "flex",
-                              gap: "4px",
+                              gap: "3px",
                               flexWrap: "wrap",
                             }}
                           >
                             {card.labels.map((label) => (
                               <span
                                 key={label.id}
+                                className="label-chip"
                                 style={{
-                                  backgroundColor: label.color || "#ebecf0",
-                                  color: label.color ? "#fff" : "#172b4d",
-                                  padding: "1px 4px",
-                                  borderRadius: "3px",
-                                  fontSize: "10px",
-                                  fontWeight: "600",
+                                  backgroundColor: label.color || "#e5e7eb",
+                                  color: label.color
+                                    ? "#fff"
+                                    : "var(--text-primary)",
                                 }}
                               >
                                 {label.name || "Label"}
@@ -767,79 +474,38 @@ function App() {
                             ))}
                           </div>
                         ) : (
-                          <span style={{ color: "#a5adba" }}>-</span>
+                          <span className="due-none">—</span>
                         )}
                       </td>
-                      <td
-                        style={{
-                          padding: "6px 8px",
-                          color: card.isOverdue
-                            ? "#bf2600"
-                            : card.due !== "-"
-                              ? "#172b4d"
-                              : "#a5adba",
-                          fontWeight: card.isOverdue ? "600" : "normal",
-                        }}
-                      >
-                        {card.due}
-                      </td>
-                      <td style={{ textAlign: "center", padding: "6px 8px" }}>
-                        {card.isDone ? (
-                          <span
-                            style={{
-                              backgroundColor: "#e3fcef",
-                              color: "#006644",
-                              padding: "2px 6px",
-                              borderRadius: "10px",
-                              fontSize: "10px",
-                              fontWeight: "700",
-                              display: "inline-block",
-                            }}
-                          >
-                            DONE
-                          </span>
-                        ) : card.isOverdue ? (
-                          <span
-                            style={{
-                              backgroundColor: "#ffebe6",
-                              color: "#bf2600",
-                              padding: "2px 6px",
-                              borderRadius: "10px",
-                              fontSize: "10px",
-                              fontWeight: "700",
-                              display: "inline-block",
-                            }}
-                          >
-                            OVERDUE
-                          </span>
+
+                      <td>
+                        {card.due === "-" ? (
+                          <span className="due-none">—</span>
                         ) : (
                           <span
-                            style={{
-                              backgroundColor: "#fffae6",
-                              color: "#b36200",
-                              padding: "2px 6px",
-                              borderRadius: "10px",
-                              fontSize: "10px",
-                              fontWeight: "700",
-                              display: "inline-block",
-                            }}
+                            className={
+                              card.isOverdue ? "due-overdue" : "due-normal"
+                            }
                           >
-                            PENDING
+                            {card.due}
                           </span>
+                        )}
+                      </td>
+
+                      <td className="center">
+                        {card.isDone ? (
+                          <span className="badge badge-done">✓ Done</span>
+                        ) : card.isOverdue ? (
+                          <span className="badge badge-overdue">⚠ Overdue</span>
+                        ) : (
+                          <span className="badge badge-pending">◷ Pending</span>
                         )}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan="6"
-                      style={{
-                        textAlign: "center",
-                        padding: "20px",
-                        color: "#5e6c84",
-                      }}
-                    >
+                    <td colSpan="6" className="empty-state">
                       No tasks match the selected filters.
                     </td>
                   </tr>
