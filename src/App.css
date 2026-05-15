@@ -869,26 +869,6 @@ body {
   gap: 10px;
 }
 
-.sw-export-cancel {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 15px;
-  border: 1px solid var(--border);
-  border: none;
-  background: transparent;
-  color: var(--text-1);
-  font-family: var(--font);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  transition:
-    opacity var(--tr),
-    transform var(--tr);
-  box-shadow: var(--glow-cyan);
-}
-
 .sw-export-header {
   display: flex;
   align-items: flex-start;

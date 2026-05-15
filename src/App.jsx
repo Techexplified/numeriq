@@ -767,14 +767,6 @@ function App() {
             </div>
 
             <div className="sw-export-actions">
-              <button
-                className="sw-export-cancel"
-                onClick={() => setShowExportModal(false)}
-              >
-                <X size={13} strokeWidth={2.5} />
-                Cancel
-              </button>
-
               <button className="sw-btn-dl" onClick={handleExport}>
                 <Download size={13} strokeWidth={2.5} />
                 Download
