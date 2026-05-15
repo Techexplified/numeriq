@@ -170,8 +170,8 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: linear-gradient(
     135deg,
-    rgba(34, 211, 238, 0.12),
-    rgba(129, 140, 248, 0.14)
+    rgba(34, 211, 238, 0.22),
+    rgba(129, 140, 248, 0.24)
   );
   color: var(--text-1);
   cursor: pointer;
@@ -193,6 +193,16 @@ body {
   box-shadow:
     0 0 0 1px rgba(34, 211, 238, 0.12),
     0 6px 18px rgba(34, 211, 238, 0.18);
+}
+
+.sw-toggle svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+[data-theme="light"] .sw-toggle svg {
+  color: #111827;
+  stroke: #111827;
 }
 
 /* ─── DOWNLOAD BUTTON ───────────────────────────────────────── */
