@@ -767,23 +767,12 @@ function App() {
             </div>
 
             <div className="sw-export-actions">
-              {/* <button
+              <button
                 className="sw-export-cancel"
                 onClick={() => setShowExportModal(false)}
               >
-                Cancel
-              </button>
-
-              <button className="sw-export-download" onClick={handleExport}>
-                Download
-              </button> */}
-
-              <button
-                className="sw-btn-dl"
-                onClick={() => setShowExportModal(false)}
-              >
                 <X size={13} strokeWidth={2.5} />
-                Download
+                Cancel
               </button>
 
               <button className="sw-btn-dl" onClick={handleExport}>
