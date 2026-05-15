@@ -901,12 +901,12 @@ body {
 }
 
 .sw-export-close {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-2);
+  border: 1px solid rgba(34, 211, 238, 0.45);
+  background: rgba(34, 211, 238, 0.12);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -917,6 +917,13 @@ body {
 
 .sw-export-close:hover {
   border-color: var(--cyan);
+  background: rgba(34, 211, 238, 0.22);
   color: var(--cyan);
-  background: var(--cyan-dim);
+  transform: translateY(-1px);
+}
+
+.sw-export-close svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
 }
