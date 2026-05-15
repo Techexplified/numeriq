@@ -13,6 +13,7 @@ import {
   Calendar,
   ClipboardList,
   FileSpreadsheet,
+  X,
 } from "lucide-react";
 import "./App.css";
 import html2pdf from "html2pdf.js";
@@ -708,8 +709,17 @@ function App() {
         >
           <div className="sw-export-modal" onClick={(e) => e.stopPropagation()}>
             <div className="sw-export-header">
-              <h3>Export Report</h3>
-              <p>Select export format</p>
+              <div>
+                <h3>Export Report</h3>
+                <p>Select export format</p>
+              </div>
+
+              <button
+                className="sw-export-close"
+                onClick={() => setShowExportModal(false)}
+              >
+                <X size={16} strokeWidth={2.5} />
+              </button>
             </div>
 
             <div className="sw-export-options">
