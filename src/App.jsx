@@ -14,6 +14,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import "./App.css";
+import html2pdf from "html2pdf.js";
 
 /* global TrelloPowerUp */
 
@@ -120,16 +121,32 @@ function App() {
     loadData();
   }, []);
 
-  const downloadPDF = () => {
-    const element = document.getElementById("pdf-content");
-    const opt = {
-      margin: 0.3,
-      filename: `${boardName}_Summify_Report.pdf`,
-      image: { type: "jpeg", quality: 1 },
-      html2canvas: { scale: 2, scrollX: 0, scrollY: 0, useCORS: true },
-      jsPDF: { unit: "in", format: "a4", orientation: "landscape" },
-    };
-    window.html2pdf().set(opt).from(element).save();
+  const downloadPDF = async () => {
+    try {
+      const element = document.getElementById("pdf-content");
+
+      if (!element) return;
+
+      const opt = {
+        margin: 0.3,
+        filename: `${boardName}_Summify_Report.pdf`,
+        image: { type: "jpeg", quality: 1 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          scrollY: 0,
+        },
+        jsPDF: {
+          unit: "in",
+          format: "a4",
+          orientation: "landscape",
+        },
+      };
+
+      await html2pdf().set(opt).from(element).save();
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+    }
   };
 
   const getLabelName = (label) => {
