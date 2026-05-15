@@ -376,16 +376,17 @@ function App() {
             <div className="sw-chart-card">
               <div className="sw-chart-title">Completion Rate</div>
 
-              <ResponsiveContainer width="100%" height={240}>
+              <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
                   <Pie
                     data={completionChartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={55}
-                    outerRadius={85}
-                    paddingAngle={3}
+                    innerRadius={62}
+                    outerRadius={88}
+                    paddingAngle={2}
                     dataKey="value"
+                    stroke="none"
                   >
                     {completionChartData.map((entry, index) => (
                       <Cell
@@ -394,26 +395,31 @@ function App() {
                       />
                     ))}
                   </Pie>
-
-                  <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
 
-              <div className="sw-chart-legend">
-                <div className="sw-legend-item">
-                  <span
-                    className="sw-legend-dot"
-                    style={{ background: "#00e676" }}
-                  />
-                  Completed
+              <div className="sw-chart-center">
+                <div className="sw-chart-percent">
+                  {totals.totalCards > 0
+                    ? Math.round(
+                        (totals.completedCards / totals.totalCards) * 100,
+                      )
+                    : 0}
+                  %
                 </div>
 
-                <div className="sw-legend-item">
-                  <span
-                    className="sw-legend-dot"
-                    style={{ background: "#ffb300" }}
-                  />
-                  Pending
+                <div className="sw-chart-subtext">done</div>
+              </div>
+
+              <div className="sw-chart-stats">
+                <div className="sw-chart-stat completed">
+                  <span className="sw-chart-stat-dot" />
+                  {totals.completedCards} Completed
+                </div>
+
+                <div className="sw-chart-stat pending">
+                  <span className="sw-chart-stat-dot" />
+                  {totals.totalCards - totals.completedCards} Pending
                 </div>
               </div>
             </div>

@@ -684,3 +684,71 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.sw-chart-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.sw-chart-center {
+  position: absolute;
+  top: 53%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.sw-chart-percent {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-1);
+  letter-spacing: -1px;
+}
+
+.sw-chart-subtext {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-2);
+  font-weight: 500;
+  text-transform: lowercase;
+}
+
+.sw-chart-stats {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.sw-chart-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.sw-chart-stat-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.sw-chart-stat.completed {
+  color: #00e676;
+}
+
+.sw-chart-stat.completed .sw-chart-stat-dot {
+  background: #00e676;
+}
+
+.sw-chart-stat.pending {
+  color: #ffb300;
+}
+
+.sw-chart-stat.pending .sw-chart-stat-dot {
+  background: #ffb300;
+}
