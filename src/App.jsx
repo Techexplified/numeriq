@@ -17,8 +17,6 @@ import "./App.css";
 import html2pdf from "html2pdf.js";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
-/* global TrelloPowerUp */
-
 function App() {
   const [boardName, setBoardName] = useState("");
   const [totals, setTotals] = useState({
@@ -30,6 +28,8 @@ function App() {
   const [cardsData, setCardsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState("dark");
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportType, setExportType] = useState("pdf");
 
   // Filter States
   const [filterStatus, setFilterStatus] = useState("All");
@@ -148,6 +148,50 @@ function App() {
     } catch (err) {
       console.error("PDF generation failed:", err);
     }
+  };
+
+  const downloadCSV = () => {
+    const headers = ["Task", "List", "Members", "Labels", "Due Date", "Status"];
+
+    const rows = cardsData.map((card) => [
+      card.name,
+      card.listName,
+      card.members.map((m) => m.fullName).join(", "),
+      card.labels.map((l) => l.name || l.color).join(", "),
+      card.due,
+      card.isDone ? "Completed" : card.isOverdue ? "Overdue" : "Pending",
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.map((item) => `"${item ?? ""}"`).join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `${boardName}_Summify_Report.csv`);
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExport = () => {
+    if (exportType === "pdf") {
+      downloadPDF();
+    } else {
+      downloadCSV();
+    }
+
+    setShowExportModal(false);
   };
 
   const getLabelName = (label) => {
@@ -277,9 +321,12 @@ function App() {
             )}
           </button>
 
-          <button className="sw-btn-dl" onClick={downloadPDF}>
+          <button
+            className="sw-btn-dl"
+            onClick={() => setShowExportModal(true)}
+          >
             <Download size={13} strokeWidth={2.5} />
-            Download PDF
+            Export Report
           </button>
         </div>
       </header>
@@ -652,6 +699,81 @@ function App() {
           </div>
         </div>
       </div>
+
+      {showExportModal && (
+        <div
+          className="sw-export-overlay"
+          onClick={() => setShowExportModal(false)}
+        >
+          <div className="sw-export-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="sw-export-header">
+              <h3>Export Report</h3>
+              <p>Select export format</p>
+            </div>
+
+            <div className="sw-export-options">
+              <div
+                className={`sw-export-option ${
+                  exportType === "pdf" ? "active" : ""
+                }`}
+                onClick={() => setExportType("pdf")}
+              >
+                <div className="sw-export-option-left">
+                  <div className="sw-export-icon">
+                    <Download size={18} strokeWidth={2.5} />
+                  </div>
+
+                  <div>
+                    <div className="sw-export-title">PDF Report</div>
+                    <div className="sw-export-sub">
+                      Complete report with charts
+                    </div>
+                  </div>
+                </div>
+
+                <div className="sw-radio">
+                  {exportType === "pdf" && <div className="sw-radio-inner" />}
+                </div>
+              </div>
+
+              <div
+                className={`sw-export-option ${
+                  exportType === "csv" ? "active" : ""
+                }`}
+                onClick={() => setExportType("csv")}
+              >
+                <div className="sw-export-option-left">
+                  <div className="sw-export-icon">
+                    <FileSpreadsheet size={18} strokeWidth={2.5} />
+                  </div>
+
+                  <div>
+                    <div className="sw-export-title">CSV Data</div>
+                    <div className="sw-export-sub">Raw spreadsheet export</div>
+                  </div>
+                </div>
+
+                <div className="sw-radio">
+                  {exportType === "csv" && <div className="sw-radio-inner" />}
+                </div>
+              </div>
+            </div>
+
+            <div className="sw-export-actions">
+              <button
+                className="sw-export-cancel"
+                onClick={() => setShowExportModal(false)}
+              >
+                Cancel
+              </button>
+
+              <button className="sw-export-download" onClick={handleExport}>
+                Download
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
