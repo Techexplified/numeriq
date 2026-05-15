@@ -376,14 +376,14 @@ function App() {
             <div className="sw-chart-card">
               <div className="sw-chart-title">Completion Rate</div>
 
-              <ResponsiveContainer width="100%" height={260}>
+              <ResponsiveContainer width="100%" height={190}>
                 <PieChart>
                   <Pie
                     data={completionChartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={62}
-                    outerRadius={88}
+                    innerRadius={46}
+                    outerRadius={68}
                     paddingAngle={2}
                     dataKey="value"
                     stroke="none"
