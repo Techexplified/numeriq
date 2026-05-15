@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import "./App.css";
 import html2pdf from "html2pdf.js";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 /* global TrelloPowerUp */
 
@@ -225,6 +226,19 @@ function App() {
     filterSpecificDate,
   ]);
 
+  const completionChartData = [
+    {
+      name: "Completed",
+      value: totals.completedCards,
+    },
+    {
+      name: "Pending",
+      value: totals.totalCards - totals.completedCards,
+    },
+  ];
+
+  const CHART_COLORS = ["#00e676", "#ffb300"];
+
   if (loading) {
     return (
       <div className="sw-loading">
@@ -299,6 +313,7 @@ function App() {
         </div>
 
         {/* ── LIST SUMMARY ── */}
+        {/* ── LIST SUMMARY ── */}
         <div className="sw-card">
           <div className="sw-card-header">
             <div className="sw-section-title">
@@ -309,43 +324,99 @@ function App() {
             </div>
           </div>
 
-          <div className="sw-table-wrap">
-            <table className="sw-table">
-              <colgroup>
-                <col style={{ width: "40%" }} />
-                <col style={{ width: "20%" }} />
-                <col style={{ width: "20%" }} />
-                <col style={{ width: "20%" }} />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>List Name</th>
-                  <th className="tc">Total Cards</th>
-                  <th className="tc">Completed</th>
-                  <th className="tc">Pending</th>
-                </tr>
-              </thead>
-              <tbody>
-                {listData.map((list) => (
-                  <tr key={list.id}>
-                    <td>
-                      <span className="sw-task-name">{list.name}</span>
-                    </td>
-                    <td className="tc">{list.totalCards}</td>
-                    <td
-                      className={`tc ${list.completed > 0 ? "sw-num-done" : ""}`}
-                    >
-                      {list.completed}
-                    </td>
-                    <td
-                      className={`tc ${list.pending > 0 ? "sw-num-pend" : ""}`}
-                    >
-                      {list.pending}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="sw-summary-layout">
+            {/* TABLE */}
+            <div className="sw-summary-table">
+              <div className="sw-table-wrap">
+                <table className="sw-table">
+                  <colgroup>
+                    <col style={{ width: "40%" }} />
+                    <col style={{ width: "20%" }} />
+                    <col style={{ width: "20%" }} />
+                    <col style={{ width: "20%" }} />
+                  </colgroup>
+
+                  <thead>
+                    <tr>
+                      <th>List Name</th>
+                      <th className="tc">Total Cards</th>
+                      <th className="tc">Completed</th>
+                      <th className="tc">Pending</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {listData.map((list) => (
+                      <tr key={list.id}>
+                        <td>
+                          <span className="sw-task-name">{list.name}</span>
+                        </td>
+
+                        <td className="tc">{list.totalCards}</td>
+
+                        <td
+                          className={`tc ${list.completed > 0 ? "sw-num-done" : ""}`}
+                        >
+                          {list.completed}
+                        </td>
+
+                        <td
+                          className={`tc ${list.pending > 0 ? "sw-num-pend" : ""}`}
+                        >
+                          {list.pending}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* PIE CHART */}
+            <div className="sw-chart-card">
+              <div className="sw-chart-title">Completion Rate</div>
+
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie
+                    data={completionChartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={55}
+                    outerRadius={85}
+                    paddingAngle={3}
+                    dataKey="value"
+                  >
+                    {completionChartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={CHART_COLORS[index % CHART_COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+
+              <div className="sw-chart-legend">
+                <div className="sw-legend-item">
+                  <span
+                    className="sw-legend-dot"
+                    style={{ background: "#00e676" }}
+                  />
+                  Completed
+                </div>
+
+                <div className="sw-legend-item">
+                  <span
+                    className="sw-legend-dot"
+                    style={{ background: "#ffb300" }}
+                  />
+                  Pending
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
