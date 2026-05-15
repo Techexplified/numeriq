@@ -180,9 +180,6 @@ body {
   justify-content: center;
   transition: all var(--tr);
   flex-shrink: 0;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.03),
-    0 4px 12px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(10px);
 }
 
@@ -873,16 +870,26 @@ body {
 }
 
 .sw-export-cancel {
-  padding: 10px 16px;
-  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 15px;
   border: 1px solid var(--border);
+  border: none;
   background: transparent;
   color: var(--text-1);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    opacity var(--tr),
+    transform var(--tr);
+  box-shadow: var(--glow-cyan);
 }
 
-.sw-export-download {
+/* .sw-export-download {
   padding: 8px 16px;
   border-radius: 10px;
   border: none;
@@ -890,7 +897,7 @@ body {
   color: #0d1117;
   font-weight: 700;
   cursor: pointer;
-}
+} */
 
 .sw-export-header {
   display: flex;

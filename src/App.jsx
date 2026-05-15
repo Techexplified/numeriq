@@ -767,7 +767,7 @@ function App() {
             </div>
 
             <div className="sw-export-actions">
-              <button
+              {/* <button
                 className="sw-export-cancel"
                 onClick={() => setShowExportModal(false)}
               >
@@ -775,6 +775,19 @@ function App() {
               </button>
 
               <button className="sw-export-download" onClick={handleExport}>
+                Download
+              </button> */}
+
+              <button
+                className="sw-btn-dl"
+                onClick={() => setShowExportModal(false)}
+              >
+                <X size={13} strokeWidth={2.5} />
+                Download
+              </button>
+
+              <button className="sw-btn-dl" onClick={handleExport}>
+                <Download size={13} strokeWidth={2.5} />
                 Download
               </button>
             </div>
