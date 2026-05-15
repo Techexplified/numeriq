@@ -311,17 +311,13 @@ function App() {
         </div>
 
         <div className="sw-actions">
-          <button
-            className="sw-toggle"
-            onClick={toggleTheme}
-            title="Toggle theme"
-          >
+          <div className="sw-toggle" onClick={toggleTheme} title="Toggle theme">
             {theme === "dark" ? (
               <Sun size={15} strokeWidth={2.5} />
             ) : (
               <Moon size={15} strokeWidth={2.5} />
             )}
-          </button>
+          </div>
 
           <button
             className="sw-btn-dl"
