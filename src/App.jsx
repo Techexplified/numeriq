@@ -714,12 +714,12 @@ function App() {
                 <p>Select export format</p>
               </div>
 
-              <button
+              <div
                 className="sw-export-close"
                 onClick={() => setShowExportModal(false)}
               >
                 <X size={16} strokeWidth={2.5} />
-              </button>
+              </div>
             </div>
 
             <div className="sw-export-options">
