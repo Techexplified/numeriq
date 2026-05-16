@@ -544,7 +544,7 @@ function App() {
         </div>
 
         {/* ── DETAILED TASK ANALYSIS ── */}
-        <div className="sw-card">
+        <div className="sw-card sw-summary-card">
           <div className="sw-card-header">
             <div className="sw-section-title">
               <span className="sw-section-icon">
