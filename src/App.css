@@ -650,7 +650,7 @@ body {
 }
 
 .sw-summary-table .sw-table-wrap::-webkit-scrollbar {
-  width: 8px;
+  width: 4px;
 }
 
 .sw-summary-table .sw-table-wrap::-webkit-scrollbar-track {
@@ -664,6 +664,11 @@ body {
 
 .sw-summary-table .sw-table-wrap::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.4);
+}
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
 }
 
 .sw-chart-card {
@@ -718,8 +723,11 @@ body {
 }
 
 .sw-chart-card {
-  position: relative;
-  overflow: hidden;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  min-height: 100%;
 }
 
 .sw-chart-center {
