@@ -629,146 +629,154 @@ function App() {
           </div>
 
           <div className="sw-table-wrap">
-            <table className="sw-table">
-              <colgroup>
-                <col style={{ width: "25%" }} />
-                <col style={{ width: "14%" }} />
-                <col style={{ width: "20%" }} />
-                <col style={{ width: "13%" }} />
-                <col style={{ width: "12%" }} />
-                <col style={{ width: "16%" }} />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>Task</th>
-                  <th>List</th>
-                  <th>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      <User size={10} strokeWidth={2.5} /> Members
-                    </span>
-                  </th>
-                  <th>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      <Tag size={10} strokeWidth={2.5} /> Labels
-                    </span>
-                  </th>
-                  <th>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      <Calendar size={10} strokeWidth={2.5} /> Due Date
-                    </span>
-                  </th>
-                  <th className="tc">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredCards.length > 0 ? (
-                  filteredCards.map((card) => (
-                    <tr
-                      key={card.id}
-                      className={
-                        card.isDone ? "r-done" : card.isOverdue ? "r-over" : ""
-                      }
-                    >
-                      <td>
-                        <span className="sw-task-name">{card.name}</span>
-                      </td>
+            <div className="sw-analysis-scroll">
+              <table className="sw-table">
+                <colgroup>
+                  <col style={{ width: "25%" }} />
+                  <col style={{ width: "14%" }} />
+                  <col style={{ width: "20%" }} />
+                  <col style={{ width: "13%" }} />
+                  <col style={{ width: "12%" }} />
+                  <col style={{ width: "16%" }} />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>Task</th>
+                    <th>List</th>
+                    <th>
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                        }}
+                      >
+                        <User size={10} strokeWidth={2.5} /> Members
+                      </span>
+                    </th>
+                    <th>
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                        }}
+                      >
+                        <Tag size={10} strokeWidth={2.5} /> Labels
+                      </span>
+                    </th>
+                    <th>
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                        }}
+                      >
+                        <Calendar size={10} strokeWidth={2.5} /> Due Date
+                      </span>
+                    </th>
+                    <th className="tc">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredCards.length > 0 ? (
+                    filteredCards.map((card) => (
+                      <tr
+                        key={card.id}
+                        className={
+                          card.isDone
+                            ? "r-done"
+                            : card.isOverdue
+                              ? "r-over"
+                              : ""
+                        }
+                      >
+                        <td>
+                          <span className="sw-task-name">{card.name}</span>
+                        </td>
 
-                      <td>
-                        <span className="sw-list-chip">{card.listName}</span>
-                      </td>
+                        <td>
+                          <span className="sw-list-chip">{card.listName}</span>
+                        </td>
 
-                      <td>
-                        {card.members.length > 0 ? (
-                          card.members.map((m) => (
-                            <span key={m.id} className="sw-member-chip">
-                              <User size={9} strokeWidth={2.5} />
-                              {m.fullName}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="sw-muted">Unassigned</span>
-                        )}
-                      </td>
-
-                      <td>
-                        {card.labels.length > 0 ? (
-                          <div style={{ display: "flex", flexWrap: "wrap" }}>
-                            {card.labels.map((label) => (
-                              <span
-                                key={label.id}
-                                className="sw-label-chip"
-                                style={{
-                                  backgroundColor: label.color || "#334155",
-                                  color: label.color ? "#fff" : "var(--text-1)",
-                                }}
-                              >
-                                {label.name || "Label"}
+                        <td>
+                          {card.members.length > 0 ? (
+                            card.members.map((m) => (
+                              <span key={m.id} className="sw-member-chip">
+                                <User size={9} strokeWidth={2.5} />
+                                {m.fullName}
                               </span>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="sw-due-none">—</span>
-                        )}
-                      </td>
+                            ))
+                          ) : (
+                            <span className="sw-muted">Unassigned</span>
+                          )}
+                        </td>
 
-                      <td>
-                        {card.due === "-" ? (
-                          <span className="sw-due-none">—</span>
-                        ) : (
-                          <span
-                            className={
-                              card.isOverdue ? "sw-due-over" : "sw-due-norm"
-                            }
-                          >
-                            {card.due}
-                          </span>
-                        )}
-                      </td>
+                        <td>
+                          {card.labels.length > 0 ? (
+                            <div style={{ display: "flex", flexWrap: "wrap" }}>
+                              {card.labels.map((label) => (
+                                <span
+                                  key={label.id}
+                                  className="sw-label-chip"
+                                  style={{
+                                    backgroundColor: label.color || "#334155",
+                                    color: label.color
+                                      ? "#fff"
+                                      : "var(--text-1)",
+                                  }}
+                                >
+                                  {label.name || "Label"}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="sw-due-none">—</span>
+                          )}
+                        </td>
 
-                      <td className="tc">
-                        {card.isDone ? (
-                          <span className="sw-badge b-done">
-                            <CheckCircle2 size={9} strokeWidth={3} /> Done
-                          </span>
-                        ) : card.isOverdue ? (
-                          <span className="sw-badge b-over">
-                            <AlertTriangle size={9} strokeWidth={3} /> Overdue
-                          </span>
-                        ) : (
-                          <span className="sw-badge b-pend">
-                            <Calendar size={9} strokeWidth={3} /> Pending
-                          </span>
-                        )}
+                        <td>
+                          {card.due === "-" ? (
+                            <span className="sw-due-none">—</span>
+                          ) : (
+                            <span
+                              className={
+                                card.isOverdue ? "sw-due-over" : "sw-due-norm"
+                              }
+                            >
+                              {card.due}
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="tc">
+                          {card.isDone ? (
+                            <span className="sw-badge b-done">
+                              <CheckCircle2 size={9} strokeWidth={3} /> Done
+                            </span>
+                          ) : card.isOverdue ? (
+                            <span className="sw-badge b-over">
+                              <AlertTriangle size={9} strokeWidth={3} /> Overdue
+                            </span>
+                          ) : (
+                            <span className="sw-badge b-pend">
+                              <Calendar size={9} strokeWidth={3} /> Pending
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" className="sw-empty">
+                        No tasks match the selected filters.
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="sw-empty">
-                      No tasks match the selected filters.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

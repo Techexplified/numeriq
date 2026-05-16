@@ -663,9 +663,6 @@ body {
   border-radius: 999px;
 }
 
-.sw-summary-table .sw-table-wrap::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.4);
-}
 /* Firefox */
 * {
   scrollbar-width: thin;
@@ -942,4 +939,11 @@ body {
   width: 16px;
   height: 16px;
   stroke: currentColor;
+}
+
+.sw-analysis-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 16px;
 }
