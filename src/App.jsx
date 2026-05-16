@@ -419,18 +419,19 @@ function App() {
 
         {/* ── LIST SUMMARY ── */}
         {/* ── LIST SUMMARY ── */}
-        <div className="sw-card">
-          <div className="sw-card-header">
-            <div className="sw-section-title">
-              <span className="sw-section-icon">
-                <List size={13} strokeWidth={2.5} />
-              </span>
-              List Summary
-            </div>
-          </div>
 
-          <div className="sw-summary-layout">
-            {/* TABLE */}
+        <div className="sw-summary-layout">
+          {/* LIST SUMMARY CARD */}
+          <div className="sw-card">
+            <div className="sw-card-header">
+              <div className="sw-section-title">
+                <span className="sw-section-icon">
+                  <List size={13} strokeWidth={2.5} />
+                </span>
+                List Summary
+              </div>
+            </div>
+
             <div className="sw-summary-table">
               <div className="sw-table-wrap">
                 <table className="sw-table">
@@ -460,13 +461,17 @@ function App() {
                         <td className="tc">{list.totalCards}</td>
 
                         <td
-                          className={`tc ${list.completed > 0 ? "sw-num-done" : ""}`}
+                          className={`tc ${
+                            list.completed > 0 ? "sw-num-done" : ""
+                          }`}
                         >
                           {list.completed}
                         </td>
 
                         <td
-                          className={`tc ${list.pending > 0 ? "sw-num-pend" : ""}`}
+                          className={`tc ${
+                            list.pending > 0 ? "sw-num-pend" : ""
+                          }`}
                         >
                           {list.pending}
                         </td>
@@ -476,56 +481,63 @@ function App() {
                 </table>
               </div>
             </div>
+          </div>
 
-            {/* PIE CHART */}
-            <div className="sw-chart-card">
-              <div className="sw-chart-title">Completion Rate</div>
+          {/* PIE CHART CARD */}
+          <div className="sw-card sw-chart-card">
+            <div className="sw-card-header">
+              <div className="sw-section-title">
+                <span className="sw-section-icon">
+                  <CheckCircle2 size={13} strokeWidth={2.5} />
+                </span>
+                Completion Rate
+              </div>
+            </div>
 
-              <ResponsiveContainer width="100%" height={190}>
-                <PieChart>
-                  <Pie
-                    data={completionChartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={46}
-                    outerRadius={68}
-                    paddingAngle={2}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {completionChartData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={CHART_COLORS[index % CHART_COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={190}>
+              <PieChart>
+                <Pie
+                  data={completionChartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={46}
+                  outerRadius={68}
+                  paddingAngle={2}
+                  dataKey="value"
+                  stroke="none"
+                >
+                  {completionChartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={CHART_COLORS[index % CHART_COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
 
-              <div className="sw-chart-center">
-                <div className="sw-chart-percent">
-                  {totals.totalCards > 0
-                    ? Math.round(
-                        (totals.completedCards / totals.totalCards) * 100,
-                      )
-                    : 0}
-                  %
-                </div>
-
-                <div className="sw-chart-subtext">done</div>
+            <div className="sw-chart-center">
+              <div className="sw-chart-percent">
+                {totals.totalCards > 0
+                  ? Math.round(
+                      (totals.completedCards / totals.totalCards) * 100,
+                    )
+                  : 0}
+                %
               </div>
 
-              <div className="sw-chart-stats">
-                <div className="sw-chart-stat completed">
-                  <span className="sw-chart-stat-dot" />
-                  {totals.completedCards} Completed
-                </div>
+              <div className="sw-chart-subtext">done</div>
+            </div>
 
-                <div className="sw-chart-stat pending">
-                  <span className="sw-chart-stat-dot" />
-                  {totals.totalCards - totals.completedCards} Pending
-                </div>
+            <div className="sw-chart-stats">
+              <div className="sw-chart-stat completed">
+                <span className="sw-chart-stat-dot" />
+                {totals.completedCards} Completed
+              </div>
+
+              <div className="sw-chart-stat pending">
+                <span className="sw-chart-stat-dot" />
+                {totals.totalCards - totals.completedCards} Pending
               </div>
             </div>
           </div>
