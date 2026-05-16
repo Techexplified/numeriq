@@ -249,38 +249,61 @@ function App() {
         const today = new Date();
 
         if (filterDueType === "Today") {
-          if (!card.rawDue) return false;
+          const inTodayList = card.listName.toLowerCase().trim() === "today";
 
-          const isToday =
-            card.rawDue.getDate() === today.getDate() &&
-            card.rawDue.getMonth() === today.getMonth() &&
-            card.rawDue.getFullYear() === today.getFullYear();
+          let hasTodayDueDate = false;
 
-          if (!isToday) return false;
+          if (card.rawDue) {
+            hasTodayDueDate =
+              card.rawDue.getDate() === today.getDate() &&
+              card.rawDue.getMonth() === today.getMonth() &&
+              card.rawDue.getFullYear() === today.getFullYear();
+          }
+
+          if (!inTodayList && !hasTodayDueDate) {
+            return false;
+          }
         }
 
         if (filterDueType === "This Week") {
-          if (!card.rawDue) return false;
+          const inWeekList = card.listName.toLowerCase().trim() === "this week";
 
-          const startOfWeek = new Date(today);
-          startOfWeek.setDate(today.getDate() - today.getDay());
+          let hasWeekDueDate = false;
 
-          const endOfWeek = new Date(startOfWeek);
-          endOfWeek.setDate(startOfWeek.getDate() + 6);
+          if (card.rawDue) {
+            const startOfWeek = new Date(today);
+            startOfWeek.setHours(0, 0, 0, 0);
 
-          if (card.rawDue < startOfWeek || card.rawDue > endOfWeek) {
+            startOfWeek.setDate(today.getDate() - today.getDay());
+
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            endOfWeek.setHours(23, 59, 59, 999);
+
+            hasWeekDueDate =
+              card.rawDue >= startOfWeek && card.rawDue <= endOfWeek;
+          }
+
+          if (!inWeekList && !hasWeekDueDate) {
             return false;
           }
         }
 
         if (filterDueType === "This Month") {
-          if (!card.rawDue) return false;
+          const inMonthList =
+            card.listName.toLowerCase().trim() === "this month";
 
-          const isThisMonth =
-            card.rawDue.getMonth() === today.getMonth() &&
-            card.rawDue.getFullYear() === today.getFullYear();
+          let hasMonthDueDate = false;
 
-          if (!isThisMonth) return false;
+          if (card.rawDue) {
+            hasMonthDueDate =
+              card.rawDue.getMonth() === today.getMonth() &&
+              card.rawDue.getFullYear() === today.getFullYear();
+          }
+
+          if (!inMonthList && !hasMonthDueDate) {
+            return false;
+          }
         }
 
         if (filterDueType === "Has Due Date" && card.due === "-") return false;
