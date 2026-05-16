@@ -461,7 +461,7 @@ body {
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-strong);
   background: var(--bg-input);
-  color: var(--text-1);
+  color: rgba(226, 232, 240, 0.82);
   outline: none;
   cursor: pointer;
   appearance: none;
@@ -470,6 +470,10 @@ body {
   background-repeat: no-repeat;
   background-position: right 7px center;
   transition: all var(--tr);
+}
+
+.sw-select option {
+  color: #cbd5e1;
 }
 
 .sw-select:hover,
@@ -633,10 +637,44 @@ body {
 
 .sw-summary-table {
   min-width: 0;
+  background: var(--bg-th);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0;
+  overflow: hidden;
+}
+
+.sw-summary-table .sw-table-wrap {
+  max-height: 248px;
+  overflow-y: auto;
+}
+
+.sw-summary-table .sw-table-wrap::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sw-summary-table .sw-table-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sw-summary-table .sw-table-wrap::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+}
+
+.sw-summary-table .sw-table-wrap::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.4);
 }
 
 .sw-chart-card {
-  background: var(--bg-th);
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.96),
+    rgba(17, 24, 39, 0.96)
+  );
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 14px 10px;
