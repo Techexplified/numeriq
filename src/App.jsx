@@ -246,6 +246,43 @@ function App() {
       }
 
       if (filterDueType !== "All") {
+        const today = new Date();
+
+        if (filterDueType === "Today") {
+          if (!card.rawDue) return false;
+
+          const isToday =
+            card.rawDue.getDate() === today.getDate() &&
+            card.rawDue.getMonth() === today.getMonth() &&
+            card.rawDue.getFullYear() === today.getFullYear();
+
+          if (!isToday) return false;
+        }
+
+        if (filterDueType === "This Week") {
+          if (!card.rawDue) return false;
+
+          const startOfWeek = new Date(today);
+          startOfWeek.setDate(today.getDate() - today.getDay());
+
+          const endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+          if (card.rawDue < startOfWeek || card.rawDue > endOfWeek) {
+            return false;
+          }
+        }
+
+        if (filterDueType === "This Month") {
+          if (!card.rawDue) return false;
+
+          const isThisMonth =
+            card.rawDue.getMonth() === today.getMonth() &&
+            card.rawDue.getFullYear() === today.getFullYear();
+
+          if (!isThisMonth) return false;
+        }
+
         if (filterDueType === "Has Due Date" && card.due === "-") return false;
         if (filterDueType === "No Due Date" && card.due !== "-") return false;
         if (filterDueType === "Specific Date" && filterSpecificDate) {
@@ -536,6 +573,9 @@ function App() {
                   onChange={(e) => setFilterDueType(e.target.value)}
                 >
                   <option value="All">Due Date: All</option>
+                  <option value="Today">Today</option>
+                  <option value="This Week">This Week</option>
+                  <option value="This Month">This Month</option>
                   <option value="Has Due Date">Has Due Date</option>
                   <option value="No Due Date">No Due Date</option>
                   <option value="Specific Date">Specific Date…</option>
