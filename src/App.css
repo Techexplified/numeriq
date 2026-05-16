@@ -723,11 +723,8 @@ body {
 }
 
 .sw-chart-card {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 24px;
-  min-height: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 .sw-chart-center {
