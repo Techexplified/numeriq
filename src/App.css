@@ -633,6 +633,7 @@ body {
   grid-template-columns: 1.7fr 0.55fr;
   gap: 18px;
   align-items: start;
+  margin-bottom: 14px;
 }
 
 .sw-summary-table {
