@@ -385,7 +385,7 @@ function App() {
           </button>
 
           {/* PLANS ICON */}
-          <div className="sw-plans-btn" title="See all plans">
+          <div className="sw-toggle" title="See all plans">
             <Sparkles size={15} strokeWidth={2.5} />
           </div>
         </div>
