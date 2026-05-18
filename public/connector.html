@@ -1,67 +1,69 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Summify Connector</title>
-  <script src="https://p.trellocdn.com/power-up.min.js"></script>
-</head>
-<body>
-<script>
-// Pure White SVG for the Bar Chart (Stats Dashboard)
-var DASHBOARD_ICON = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M4 20h16v2H4zM16 8h3v10h-3zM10.5 4h3v14h-3zM5 12h3v6H5z'/%3E%3C/svg%3E";
+  <head>
+    <meta charset="UTF-8" />
+    <title>Summify Connector</title>
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  </head>
+  <body>
+    <script>
+      // Pure White SVG for the Bar Chart (Stats Dashboard)
+      var DASHBOARD_ICON =
+        "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M4 20h16v2H4zM16 8h3v10h-3zM10.5 4h3v14h-3zM5 12h3v6H5z'/%3E%3C/svg%3E";
 
-// Pure White SVG for the Hashtag (Toggle Numbers)
-var HASHTAG_ICON = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M11 4h2v4h4v2h-4v4h4v2h-4v4h-2v-4H7v4H5v-4H1v-2h4v-4H1V8h4V4h2v4h4V4zm-4 6v4h4v-4H7z'/%3E%3C/svg%3E";
+      // Pure White SVG for the Hashtag (Toggle Numbers)
+      var HASHTAG_ICON =
+        "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M11 4h2v4h4v2h-4v4h4v2h-4v4h-2v-4H7v4H5v-4H1v-2h4v-4H1V8h4V4h2v4h4V4zm-4 6v4h4v-4H7z'/%3E%3C/svg%3E";
 
-window.TrelloPowerUp.initialize({
-
-  // 1. BOARD BUTTONS
-  "board-buttons": function (t) {
-    return t.get('board', 'shared', 'showBadges', true).then(function(showBadges) {
-      return [
-        {
-          icon: DASHBOARD_ICON,
-          text: "Summify Stats",
-          callback: function (t) {
-            return t.modal({
-              title: "Summify Dashboard",
-              url: "./index.html", 
-              fullscreen: true // <-- THIS IS THE FIX!
+      window.TrelloPowerUp.initialize({
+        // 1. BOARD BUTTONS
+        "board-buttons": function (t) {
+          return t
+            .get("board", "shared", "showBadges", true)
+            .then(function (showBadges) {
+              return [
+                {
+                  icon: DASHBOARD_ICON,
+                  text: "Summify Stats",
+                  callback: function (t) {
+                    return t.modal({
+                      //title: "Summify Dashboard",
+                      url: "./index.html",
+                      fullscreen: true, // <-- THIS IS THE FIX!
+                    });
+                  },
+                },
+                {
+                  icon: HASHTAG_ICON,
+                  text: showBadges ? "Hide #s" : "Show #s",
+                  callback: function (t) {
+                    return t.set("board", "shared", "showBadges", !showBadges);
+                  },
+                },
+              ];
             });
-          }
         },
-        {
-          icon: HASHTAG_ICON,
-          text: showBadges ? "Hide #s" : "Show #s",
-          callback: function (t) {
-            return t.set('board', 'shared', 'showBadges', !showBadges);
-          }
-        }
-      ];
-    });
-  },
 
-  // 2. CARD BADGES
-  "card-badges": function (t) {
-    return Promise.all([
-      t.card("idShort"), 
-      t.get('board', 'shared', 'showBadges', true) 
-    ]).then(function([card, showBadges]) {
-      
-      const badges = [];
+        // 2. CARD BADGES
+        "card-badges": function (t) {
+          return Promise.all([
+            t.card("idShort"),
+            t.get("board", "shared", "showBadges", true),
+          ]).then(function ([card, showBadges]) {
+            const badges = [];
 
-      // Add the # number if the toggle is ON
-      if (card.idShort && showBadges !== false) {
-        badges.push({
-          text: "#" + card.idShort,
-          color: "blue"
-        });
-      }
-      
-      return badges;
-    });
-  }
-});
-</script>
-</body>
+            // Add the # number if the toggle is ON
+            if (card.idShort && showBadges !== false) {
+              badges.push({
+                text: "#" + card.idShort,
+                color: "blue",
+              });
+            }
+
+            return badges;
+          });
+        },
+      });
+    </script>
+  </body>
 </html>
