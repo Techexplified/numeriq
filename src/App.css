@@ -1053,21 +1053,22 @@ body {
 
 .sw-plan-btn {
   width: fit-content;
-  min-width: 130px;
-  height: 38px;
+  min-width: 150px;
+  height: 40px;
 
-  padding: 0 16px;
+  padding: 0 18px;
+  margin: 0 auto;
 
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
 
   background: linear-gradient(135deg, #4cc9f0, #7b8cff);
 
-  color: #06111f;
+  color: #07111f;
   font-size: 13px;
   font-weight: 700;
 
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
