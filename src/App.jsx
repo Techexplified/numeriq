@@ -416,7 +416,7 @@ function App() {
 
                 <button className="sw-plan-btn">
                   <ExternalLink size={13} strokeWidth={2.5} />
-                  View Plans
+                  View All Plans
                 </button>
               </div>
             )}
