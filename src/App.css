@@ -947,3 +947,28 @@ body {
   overflow-x: hidden;
   border-radius: 16px;
 }
+
+.sw-plans-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+
+  color: #c9d4e5;
+  cursor: pointer;
+
+  transition: all 0.18s ease;
+}
+
+.sw-plans-btn:hover {
+  background: rgba(76, 201, 240, 0.12);
+  border-color: rgba(76, 201, 240, 0.35);
+  color: #4cc9f0;
+
+  transform: translateY(-1px);
+}

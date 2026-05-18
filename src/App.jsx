@@ -14,6 +14,7 @@ import {
   ClipboardList,
   FileSpreadsheet,
   X,
+  Sparkles,
 } from "lucide-react";
 import "./App.css";
 import html2pdf from "html2pdf.js";
@@ -382,6 +383,11 @@ function App() {
             <Download size={13} strokeWidth={2.5} />
             Export Report
           </button>
+
+          {/* PLANS ICON */}
+          <div className="sw-plans-btn" title="See all plans">
+            <Sparkles size={15} strokeWidth={2.5} />
+          </div>
         </div>
       </header>
 
