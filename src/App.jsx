@@ -33,6 +33,7 @@ function App() {
   const [theme, setTheme] = useState("dark");
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportType, setExportType] = useState("pdf");
+  const [showPlans, setShowPlans] = useState(false);
 
   // Filter States
   const [filterStatus, setFilterStatus] = useState("All");
@@ -385,8 +386,36 @@ function App() {
           </button>
 
           {/* PLANS ICON */}
-          <div className="sw-toggle" title="See all plans">
-            <Sparkles size={15} strokeWidth={2.5} />
+          <div className="sw-plans-wrapper">
+            <div
+              className="sw-toggle"
+              title="See all plans"
+              onClick={() => setShowPlans((prev) => !prev)}
+            >
+              <Sparkles size={15} strokeWidth={2.5} />
+            </div>
+
+            {showPlans && (
+              <div className="sw-plans-dropdown">
+                <div className="sw-plans-title">Unlock API Access</div>
+
+                <div className="sw-plans-subtitle">
+                  Enter your API key to activate premium features.
+                </div>
+
+                <input
+                  type="text"
+                  placeholder="Enter your API key"
+                  className="sw-api-input"
+                />
+
+                <div className="sw-plan-note">
+                  Need an API key? Explore all available plans.
+                </div>
+
+                <button className="sw-plan-btn">View Plans</button>
+              </div>
+            )}
           </div>
         </div>
       </header>

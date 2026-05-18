@@ -972,3 +972,105 @@ body {
 
   transform: translateY(-1px);
 }
+
+.sw-plans-wrapper {
+  position: relative;
+}
+
+.sw-plans-dropdown {
+  position: absolute;
+  top: 52px;
+  right: 0;
+
+  width: 320px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(16, 24, 40, 0.98),
+    rgba(11, 18, 32, 0.98)
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+
+  padding: 18px;
+  z-index: 100;
+
+  backdrop-filter: blur(16px);
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.sw-plans-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 6px;
+}
+
+.sw-plans-subtitle {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #8b9bb7;
+  margin-bottom: 16px;
+}
+
+.sw-api-input {
+  width: 100%;
+  height: 42px;
+
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(255, 255, 255, 0.04);
+
+  padding: 0 14px;
+
+  color: #f8fafc;
+  font-size: 13px;
+
+  outline: none;
+  transition: all 0.2s ease;
+
+  margin-bottom: 14px;
+}
+
+.sw-api-input::placeholder {
+  color: #718096;
+}
+
+.sw-api-input:focus {
+  border-color: rgba(76, 201, 240, 0.45);
+  box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.12);
+}
+
+.sw-plan-note {
+  font-size: 12px;
+  color: #8b9bb7;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.sw-plan-btn {
+  width: 100%;
+  height: 42px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: linear-gradient(135deg, #4cc9f0, #7b8cff);
+
+  color: #06111f;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sw-plan-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
