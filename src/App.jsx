@@ -15,6 +15,7 @@ import {
   FileSpreadsheet,
   X,
   Sparkles,
+  ExternalLink,
 } from "lucide-react";
 import "./App.css";
 import html2pdf from "html2pdf.js";
@@ -413,7 +414,10 @@ function App() {
                   Need an API key? Explore all available plans.
                 </div>
 
-                <button className="sw-plan-btn">View Plans</button>
+                <button className="sw-plan-btn">
+                  <ExternalLink size={13} strokeWidth={2.5} />
+                  View Plans
+                </button>
               </div>
             )}
           </div>
