@@ -16,6 +16,7 @@ import {
   X,
   Sparkles,
   ExternalLink,
+  NotebookText,
 } from "lucide-react";
 import "./App.css";
 import html2pdf from "html2pdf.js";
@@ -393,7 +394,7 @@ function App() {
               title="See all plans"
               onClick={() => setShowPlans((prev) => !prev)}
             >
-              <Sparkles size={15} strokeWidth={2.5} />
+              <NotebookText size={15} strokeWidth={2.5} />
             </div>
 
             {showPlans && (
