@@ -362,12 +362,8 @@ function App() {
           <div className="sw-logo">
             <LayoutDashboard size={17} strokeWidth={2.5} />
           </div>
-          <div>
-            <div className="sw-title">Summify Dashboard</div>
-            <div className="sw-subtitle">
-              Board: <strong>{boardName}</strong>
-            </div>
-          </div>
+
+          <div className="sw-title">{boardName} Dashboard</div>
         </div>
 
         <div className="sw-actions">
